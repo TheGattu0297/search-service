@@ -1,0 +1,8 @@
+server:
+  port: 8081
+elastic:
+  url: localhost
+  port: 9200
+kafka:
+  url: localhost
+  port: 9092

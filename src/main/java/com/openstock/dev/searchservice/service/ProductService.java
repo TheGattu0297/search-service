@@ -30,10 +30,11 @@ public class ProductService {
     /**
      * Bulk-save the Products in the Elasticsearch cluster
      */
-    public List<Product> saveProducts(Iterable<Product> productList) {
-        List<Product> products = new ArrayList<>();
-        elasticsearchOperations.save(productList).forEach(products::add);
-        return products;
+    public List<Product> saveProducts(List<Product> productList) {
+       // List<Product> products = new ArrayList<>();
+        Iterable<Product> save = elasticsearchOperations.save(productList);
+        //elasticsearchOperations.save(productList).forEach(products::add);
+        return null;
     }
 
     public Iterable<Product> getProducts(){

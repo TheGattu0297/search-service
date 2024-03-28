@@ -1,20 +1,15 @@
-package com.openstock.dev.searchservice.model;
+package com.openstock.dev.searchservice.kafka.messagemodel;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@Document(indexName = "products")
+@AllArgsConstructor
 @Builder
-public class Product {
-
-    @Id
+public class ProductMessageModel {
     private String productID;
     private String country;
     private String type;

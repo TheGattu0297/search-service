@@ -16,7 +16,7 @@ public class ProductController {
 
 
     @PostMapping("/saveAll")
-    public Iterable<Product> addProducts (@RequestBody Iterable<Product> products){
+    public List<Product> addProducts (@RequestBody List<Product> products){
         return productService.saveProducts(products);
     }
 
