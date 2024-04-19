@@ -32,7 +32,7 @@ public class ProductService {
      */
     public List<Product> saveProducts(List<Product> productList) {
        // List<Product> products = new ArrayList<>();
-        Iterable<Product> save = elasticsearchOperations.save(productList);
+        Iterable<Product> savedProducts = elasticsearchOperations.save(productList);
         //elasticsearchOperations.save(productList).forEach(products::add);
         return null;
     }

@@ -1,5 +1,6 @@
 package com.openstock.dev.searchservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,8 +11,9 @@ import org.springframework.data.elasticsearch.annotations.Document;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(indexName = "products")
+@JsonIgnoreProperties(ignoreUnknown=true)
 @Builder
+@Document(indexName = "products")
 public class Product {
 
     @Id
