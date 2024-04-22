@@ -14,13 +14,10 @@ import java.util.List;
 @Slf4j
 public class ProductService {
 
-    private final ElasticsearchOperations elasticsearchOperations;
-
     private final ProductRepository productRepository;
 
-    public ProductService (ProductRepository productRepository, ElasticsearchOperations elasticsearchOperations) {
+    public ProductService (ProductRepository productRepository) {
         this.productRepository = productRepository;
-        this.elasticsearchOperations = elasticsearchOperations;
     }
 
     /**
