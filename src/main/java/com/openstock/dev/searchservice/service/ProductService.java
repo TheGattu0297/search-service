@@ -3,38 +3,43 @@ package com.openstock.dev.searchservice.service;
 import com.openstock.dev.searchservice.model.Product;
 import com.openstock.dev.searchservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
+@Slf4j
 public class ProductService {
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private final ElasticsearchOperations elasticsearchOperations;
-
+    public ProductService (ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
     /**
      * Persist the individual Product entity in the Elasticsearch cluster
      */
-    public Product saveProduct(Product product) {
-        return elasticsearchOperations.save(product);
+    public void saveProduct(Product product) {
+        try {
+            productRepository.save(product);
+        } catch (Exception e) {
+            log.info("Error saving product", e);
+        }
     }
+
     /**
      * Bulk-save the Products in the Elasticsearch cluster
      */
-    public List<Product> saveProducts(List<Product> productList) {
-       // List<Product> products = new ArrayList<>();
-        Iterable<Product> savedProducts = elasticsearchOperations.save(productList);
-        //elasticsearchOperations.save(productList).forEach(products::add);
-        return null;
+    public void saveProducts(List<Product> productList) {
+        try{
+            productRepository.saveAll(productList);
+        } catch (Exception e){
+            log.info("Error saving products", e);
+        }
     }
 
     public Iterable<Product> getProducts(){
@@ -51,6 +56,42 @@ public class ProductService {
 
     public List<Product> findByType(String type) {
         return productRepository.findByType(type);
+    }
+
+    public List<Product> findByRegion(String region) {
+        return productRepository.findByRegion(region);
+    }
+
+    public List<Product> findBySubRegion(String subRegion) {
+        return productRepository.findBySubRegion(subRegion);
+    }
+
+    public List<Product> findByDenomination(String denomination) {
+        return productRepository.findByDenomination(denomination);
+    }
+
+    public List<Product> findByProducer (String producer) {
+        return productRepository.findByProducer(producer);
+    }
+
+    public List<Product> findByName (String name) {
+        return productRepository.findByName(name);
+    }
+
+    public List<Product> findByVariety (String variety) {
+        return productRepository.findByVariety(variety);
+    }
+
+    public List<Product> findByAlcoholPercentage (String alcoholPercentage) {
+        return productRepository.findByAlcoholPercentage(alcoholPercentage);
+    }
+
+    public List<Product> findByVintage (String vintage) {
+        return productRepository.findByVintage(vintage);
+    }
+
+    public List<Product> findByInfo (String info) {
+        return productRepository.findByInfo(info);
     }
 
     public void deleteAll() {productRepository.deleteAll();}

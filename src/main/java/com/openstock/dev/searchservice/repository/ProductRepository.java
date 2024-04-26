@@ -15,4 +15,20 @@ public interface ProductRepository extends ElasticsearchRepository<Product,Strin
     List<Product> findByType(String type);
 
     List<Product> findByRegion (String region);
+
+    List<Product> findBySubRegion (String subRegion);
+
+    List<Product> findByDenomination (String denomination);
+
+    List<Product> findByProducer (String producer);
+
+    List<Product> findByName (String name);
+
+    List<Product> findByVariety (String variety);
+
+    List<Product> findByAlcoholPercentage (String alcoholPercentage);
+
+    List<Product> findByVintage (String vintage);
+
+    List<Product> findByInfo (String info);
 }
