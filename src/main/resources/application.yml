@@ -6,3 +6,16 @@ elastic:
 kafka:
   url: localhost
   port: 9092
+
+
+#spring:
+#  kafka:
+#    bootstrap-servers: ec2-18-130-230-76.eu-west-2.compute.amazonaws.com:9092
+#  elasticsearch:
+#    uris: https://search-service.es.eu-west-2.aws.cloud.es.io
+#    username: elastic
+#    password: sLQnFek4ZvFwRGg75ImPslI6
+#
+#kafka:
+#  url: ec2-18-130-230-76.eu-west-2.compute.amazonaws.com
+#  port: 9092
