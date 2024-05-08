@@ -40,13 +40,14 @@ public class ElasticSearchService {
     public List<Product> fetchSuggestions(String nameKeyword) {
         Criteria criteria = new Criteria("country").fuzzy(nameKeyword.toLowerCase())
                 .or("type").fuzzy(nameKeyword.toLowerCase())
-                .or("region").fuzzy(nameKeyword.toLowerCase())
-                .or("subRegion").fuzzy(nameKeyword.toLowerCase())
-                .or("denomination").fuzzy(nameKeyword.toLowerCase())
-                .or("producer").fuzzy(nameKeyword.toLowerCase())
+                .or("subType").fuzzy(nameKeyword.toLowerCase())
+                .or("reg").fuzzy(nameKeyword.toLowerCase())
+                .or("sub").fuzzy(nameKeyword.toLowerCase())
+                .or("deno").fuzzy(nameKeyword.toLowerCase())
+                .or("prod").fuzzy(nameKeyword.toLowerCase())
                 .or("name").fuzzy(nameKeyword.toLowerCase())
                 .or("variety").fuzzy(nameKeyword.toLowerCase())
-                .or("alcoholPercentage").fuzzy(nameKeyword.toLowerCase())
+                .or("alc").fuzzy(nameKeyword.toLowerCase())
                 .or("vintage").fuzzy(nameKeyword.toLowerCase());
 
         CriteriaQuery query = new CriteriaQuery(criteria)

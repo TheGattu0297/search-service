@@ -25,22 +25,26 @@ public class Product {
     private String country;
     @Field(type = FieldType.Text, name = "type")
     private String type;
-    @Field(type = FieldType.Text, name = "region")
-    private String region;
-    @Field(type = FieldType.Text, name = "subRegion")
-    private String subRegion;
-    @Field(type = FieldType.Text, name = "denomination")
-    private String denomination;
-    @Field(type = FieldType.Text, name = "producer")
-    private String producer;
+    @Field(type = FieldType.Text, name = "subType")
+    private String subType;
+    @Field(type = FieldType.Text, name = "reg")
+    private String reg;
+    @Field(type = FieldType.Text, name = "sub")
+    private String sub;
+    @Field(type = FieldType.Text, name = "deno")
+    private String deno;
+    @Field(type = FieldType.Text, name = "prod")
+    private String prod;
     @Field(type = FieldType.Text, name = "name")
     private String name;
     @Field(type = FieldType.Text, name = "variety")
     private String variety;
-    @Field(type = FieldType.Text, name = "alcoholPercentage")
-    private String alcoholPercentage;
+    @Field(type = FieldType.Text, name = "alc")
+    private String alc;
     @Field(type = FieldType.Text, name = "vintage")
     private String vintage;
     @Field(type = FieldType.Text, name = "info")
     private String info;
+    @Field(type = FieldType.Text, name = "img")
+    private String img;
 }

@@ -12,7 +12,7 @@ import java.util.List;
 @RequestMapping(value = "/search/product")
 public class ProductController {
 
-    private ProductService productService;
+    private final ProductService productService;
 
     public ProductController(ProductService productService) {
         this.productService = productService;
@@ -50,24 +50,29 @@ public class ProductController {
         return productService.findByType(type);
     }
 
+    @GetMapping("/subType/{subType}")
+    public List<Product> getProductsBySubType(@PathVariable("subType") String subType) {
+        return productService.findBySubType(subType);
+    }
+
     @GetMapping("/region/{region}")
     public List<Product> getProductsByRegion(@PathVariable("region") String region) {
-        return productService.findByRegion(region);
+        return productService.findByReg(region);
     }
 
     @GetMapping("/subRegion/{subRegion}")
     public List<Product> getProductsBySubRegion(@PathVariable("subRegion") String subRegion) {
-        return productService.findBySubRegion(subRegion);
+        return productService.findBySub(subRegion);
     }
 
     @GetMapping("/denomination/{denomination}")
     public List<Product> getProductsByDenomination(@PathVariable("denomination") String denomination) {
-        return productService.findByDenomination(denomination);
+        return productService.findByDeno(denomination);
     }
 
     @GetMapping("/producer/{producer}")
     public List<Product> getProductsByProducer(@PathVariable("producer") String producer) {
-        return productService.findByProducer(producer);
+        return productService.findByProd(producer);
     }
 
     @GetMapping("/name/{name}")
@@ -82,17 +87,12 @@ public class ProductController {
 
     @GetMapping("/alcoholPercentage/{alcoholPercentage}")
     public List<Product> getProductsByAlcoholPercentage(@PathVariable("alcoholPercentage") String alcoholPercentage) {
-        return productService.findByAlcoholPercentage(alcoholPercentage);
+        return productService.findByAlc(alcoholPercentage);
     }
 
     @GetMapping("/vintage/{vintage}")
     public List<Product> getProductsByVintage(@PathVariable("vintage") String vintage) {
         return productService.findByVintage(vintage);
-    }
-
-    @GetMapping("/info/{info}")
-    public List<Product> getProductsByInfo(@PathVariable("info") String info) {
-        return productService.findByInfo(info);
     }
 
     @DeleteMapping("/deleteAll")

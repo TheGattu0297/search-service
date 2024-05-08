@@ -2,10 +2,7 @@ package com.openstock.dev.searchservice.service;
 
 import com.openstock.dev.searchservice.model.Product;
 import com.openstock.dev.searchservice.repository.ProductRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,20 +55,24 @@ public class ProductService {
         return productRepository.findByType(type);
     }
 
-    public List<Product> findByRegion(String region) {
-        return productRepository.findByRegion(region);
+    public List<Product> findBySubType(String subType) {
+        return productRepository.findBySubType(subType);
     }
 
-    public List<Product> findBySubRegion(String subRegion) {
-        return productRepository.findBySubRegion(subRegion);
+    public List<Product> findByReg(String region) {
+        return productRepository.findByReg(region);
     }
 
-    public List<Product> findByDenomination(String denomination) {
-        return productRepository.findByDenomination(denomination);
+    public List<Product> findBySub(String subRegion) {
+        return productRepository.findBySub(subRegion);
     }
 
-    public List<Product> findByProducer (String producer) {
-        return productRepository.findByProducer(producer);
+    public List<Product> findByDeno(String denomination) {
+        return productRepository.findByDeno(denomination);
+    }
+
+    public List<Product> findByProd (String producer) {
+        return productRepository.findByProd(producer);
     }
 
     public List<Product> findByName (String name) {
@@ -82,16 +83,12 @@ public class ProductService {
         return productRepository.findByVariety(variety);
     }
 
-    public List<Product> findByAlcoholPercentage (String alcoholPercentage) {
-        return productRepository.findByAlcoholPercentage(alcoholPercentage);
+    public List<Product> findByAlc (String alcoholPercentage) {
+        return productRepository.findByAlc(alcoholPercentage);
     }
 
     public List<Product> findByVintage (String vintage) {
         return productRepository.findByVintage(vintage);
-    }
-
-    public List<Product> findByInfo (String info) {
-        return productRepository.findByInfo(info);
     }
 
     public void deleteAll() {productRepository.deleteAll();}

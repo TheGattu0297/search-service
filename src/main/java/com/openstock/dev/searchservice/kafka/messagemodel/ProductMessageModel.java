@@ -13,13 +13,15 @@ public class ProductMessageModel {
     private String productID;
     private String country;
     private String type;
-    private String region;
-    private String subRegion;
-    private String denomination;
-    private String producer;
+    private String subType;
+    private String reg;
+    private String sub;
+    private String deno;
+    private String prod;
     private String name;
     private String variety;
-    private String alcoholPercentage;
+    private String alc;
     private String vintage;
     private String info;
+    private String img;
 }
