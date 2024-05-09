@@ -1,0 +1,75 @@
+PUT /products
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "autocomplete": {
+          "type": "os_custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase", "autocomplete_filter"]
+        }
+      },
+      "filter": {
+        "autocomplete_filter": {
+          "type": "edge_ngram",
+          "min_gram": 1,
+          "max_gram": 20
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "country": {
+        "type": "text",
+        "analyzer": "autocomplete",
+        "search_analyzer": "standard"
+      },
+      "type": {
+        "type": "text",
+        "analyzer": "autocomplete",
+        "search_analyzer": "standard"
+      },
+      "region": {
+        "type": "text",
+        "analyzer": "autocomplete",
+        "search_analyzer": "standard"
+      },
+      "subRegion": {
+        "type": "text",
+        "analyzer": "autocomplete",
+        "search_analyzer": "standard"
+      },
+      "denomination": {
+        "type": "text",
+        "analyzer": "autocomplete",
+        "search_analyzer": "standard"
+      },
+      "producer": {
+        "type": "text",
+        "analyzer": "autocomplete",
+        "search_analyzer": "standard"
+      },
+      "name": {
+        "type": "text",
+        "analyzer": "autocomplete",
+        "search_analyzer": "standard"
+      },
+      "variety": {
+        "type": "text",
+        "analyzer": "autocomplete",
+        "search_analyzer": "standard"
+      },
+      "alcoholPercentage": {
+        "type": "text",
+        "analyzer": "autocomplete",
+        "search_analyzer": "standard"
+      },
+      "vintage": {
+        "type": "text",
+        "analyzer": "autocomplete",
+        "search_analyzer": "standard"
+      }
+    }
+  }
+}
