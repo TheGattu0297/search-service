@@ -28,7 +28,7 @@ public class MessageSubscriber {
         log.info("Message received for update saving:##### " + messageInfoDTOList);
         ObjectMapper mapper = new ObjectMapper();
 
-        // Convert each LinkedHashMap to Person object
+        // Convert each LinkedHashMap to object
         List<Product> toSave = messageInfoDTOList.stream()
                 .map(map -> mapper.convertValue(map, ProductMessageModel.class)) // Convert LinkedHashMap to ProductMessageModel
                 .filter(Objects::nonNull) // Filter out any null values if conversion failed

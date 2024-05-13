@@ -2,7 +2,6 @@ package com.openstock.dev.searchservice.controller;
 
 import com.openstock.dev.searchservice.model.Product;
 import com.openstock.dev.searchservice.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +19,7 @@ public class ProductController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> addProductById(@RequestBody Product product){
+    public ResponseEntity<String> addProduct (@RequestBody Product product){
         productService.saveProduct(product);
         return ResponseEntity.ok("Product inserted successfully!");
     }
@@ -32,12 +31,19 @@ public class ProductController {
     }
 
     @GetMapping("/getAll")
-    public Iterable<Product> getAllProducts(){
+    public Iterable<Product> getAllProducts (){
         return productService.getProducts();
     }
 
+    @GetMapping("/getAllInRange")
+    public Iterable<Product> getAllProductsInRange (@RequestParam(defaultValue = "0") int page,
+                                                    @RequestParam(defaultValue = "10") int size){
+        int from = page * size; // Calculate starting index based on page and size
+        return productService.getProductsInRange(from, size);
+    }
+
     @GetMapping("/getById/{productId}")
-    public Product getProduct(@PathVariable String productId){
+    public Product getProductById (@PathVariable String productId){
         return productService.getProductById(productId);
     }
 

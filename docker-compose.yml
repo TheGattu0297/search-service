@@ -7,10 +7,10 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
-      - "9243:9243"
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+#      - ELASTIC_URL=localhost:9200
 #      - ELASTIC_USERNAME=elastic
 #      - ELASTIC_PASSWORD=a1BmX3ALfOiuAxkimp0G5Ilv
     volumes:

@@ -25,12 +25,18 @@ public class KafkaConsumerConfiguration {
     String port;
 
     @Bean
-    public ConsumerFactory<String, Object> consumerFactory(@Value("${kafka.group.id:OS-Product}") String groupId,
-                                                           @Value("${kafka.requestTimeoutMS:500000}") String requestTimeoutMS,
-                                                           @Value("${kafka.heartbeatIntervalMS:1000}") String heartbeatIntervalMS,
-                                                           @Value("${kafka.maxPollIntervalMS:900000}") String maxPollIntervalMS,
-                                                           @Value("${kafka.maxPollRecordsMs:100}") String maxPollRecordsMs,
-                                                           @Value("${kafka.sessionTimeoutMs:600000}") String sessionTimeoutMs) {
+    public ConsumerFactory<String, Object> consumerFactory(@Value("${kafka.group.id:OS-Product}")
+                                                               String groupId,
+                                                           @Value("${kafka.requestTimeoutMS:500000}")
+                                                               String requestTimeoutMS,
+                                                           @Value("${kafka.heartbeatIntervalMS:1000}")
+                                                               String heartbeatIntervalMS,
+                                                           @Value("${kafka.maxPollIntervalMS:900000}")
+                                                               String maxPollIntervalMS,
+                                                           @Value("${kafka.maxPollRecordsMs:100}")
+                                                               String maxPollRecordsMs,
+                                                           @Value("${kafka.sessionTimeoutMs:600000}")
+                                                               String sessionTimeoutMs) {
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, url + ":" + port);
         config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
@@ -47,8 +53,10 @@ public class KafkaConsumerConfiguration {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerFactory(@Nullable DeadLetterPublishingRecoverer recoverer, ConsumerFactory consumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerFactory(
+            @Nullable DeadLetterPublishingRecoverer recoverer, ConsumerFactory consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         return factory;
     }
