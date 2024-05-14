@@ -1,31 +1,11 @@
 server:
-#  port: 8081
-  port: 8080
-
+  port: 8081
 elastic:
-  server_url: <server_url>
+  server_url: search-service-11f6fa.es.eu-west-2.aws.cloud.es.io
   server_port: 9243
   api_key: <api_key>
   connection_scheme: https
-
 kafka:
-<<<<<<< HEAD
-  url: ec2-18-170-229-89.eu-west-2.compute.amazonaws.com
-  port: 9092
-
-spring:
-  kafka:
-    bootstrap-servers: ec2-18-170-229-89.eu-west-2.compute.amazonaws.com
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  endpoint:
-    health:
-      show-details: always
-=======
   url: localhost
   port: 9092
 
@@ -34,11 +14,13 @@ management:
 #  kafka:
 #    bootstrap-servers: ec2-18-130-230-76.eu-west-2.compute.amazonaws.com:9092
 #  elasticsearch:
-#    uris: https://search-service.es.eu-west-2.aws.cloud.es.io
+#    uris: https://os-search-service.es.eu-west-2.aws.cloud.es.io:443
 #    username: elastic
 #    password: sLQnFek4ZvFwRGg75ImPslI6
 #
 #kafka:
 #  url: ec2-18-130-230-76.eu-west-2.compute.amazonaws.com
 #  port: 9092
->>>>>>> 9244f69 (N-Gram Analyzer and Code cleanup and versioning changes)
+#elastic:
+#  url: https://os-search-service.es.eu-west-2.aws.cloud.es.io
+#  port: 443
