@@ -31,6 +31,7 @@ public class ProductService {
         try {
             elasticsearchClient.index(i -> i
                     .index(ELASTIC_INDEX)
+                    .id(product.getProductID())  // Set the ID here
                     .document(product)
             );
         } catch (Exception e) {
@@ -48,6 +49,7 @@ public class ProductService {
                 bulkRequest.operations(op -> op
                         .index(idx -> idx
                                 .index(ELASTIC_INDEX)
+                                .id(product.getProductID())  // Set the ID here
                                 .document(product)
                         )
                 );
@@ -67,7 +69,7 @@ public class ProductService {
                     .index(ELASTIC_INDEX)
                     .query(q -> q
                             .matchAll(m -> m)
-                    ) .size(10000), Product.class);
+                    ).size(10000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .collect(Collectors.toList());
@@ -80,11 +82,11 @@ public class ProductService {
     public Iterable<Product> getProductsInRange(int from, int size) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .matchAll(m -> m)
-                    ) .from(from) // Starting index
-                      .size(size) // Number of records to fetch
+                            .index(ELASTIC_INDEX)
+                            .query(q -> q
+                                    .matchAll(m -> m)
+                            ).from(from) // Starting index
+                            .size(size) // Number of records to fetch
                     , Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
@@ -104,6 +106,25 @@ public class ProductService {
         } catch (Exception e) {
             log.error("Error retrieving product by ID: {}", e.getMessage(), e);
             return null;
+        }
+    }
+
+    public List<Product> getProductByMaster(String keyword) {
+        try {
+            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q
+                            .match(m -> m
+                                    .field("master")
+                                    .query(keyword)
+                            )
+                    ), Product.class);
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error finding products by master - {}: {}", keyword, e.getMessage(), e);
+            return List.of();
         }
     }
 
@@ -164,7 +185,7 @@ public class ProductService {
         }
     }
 
-    public List<Product> findByReg (String keyword) {
+    public List<Product> findByReg(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -183,7 +204,7 @@ public class ProductService {
         }
     }
 
-    public List<Product> findBySub (String keyword) {
+    public List<Product> findBySub(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -202,7 +223,7 @@ public class ProductService {
         }
     }
 
-    public List<Product> findByDeno (String keyword) {
+    public List<Product> findByDeno(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -221,7 +242,7 @@ public class ProductService {
         }
     }
 
-    public List<Product> findByProd (String keyword) {
+    public List<Product> findByProd(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -240,7 +261,7 @@ public class ProductService {
         }
     }
 
-    public List<Product> findByName (String keyword) {
+    public List<Product> findByName(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -259,7 +280,7 @@ public class ProductService {
         }
     }
 
-    public List<Product> findByVariety (String keyword) {
+    public List<Product> findByVariety(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -278,7 +299,7 @@ public class ProductService {
         }
     }
 
-    public List<Product> findByAlc (String keyword) {
+    public List<Product> findByAlc(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -297,7 +318,7 @@ public class ProductService {
         }
     }
 
-    public List<Product> findByVintage (String keyword) {
+    public List<Product> findByVintage(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -328,6 +349,7 @@ public class ProductService {
             log.error("Error deleting all products: {}", e.getMessage(), e);
         }
     }
+}
 
 //    private final ProductRepository productRepository;
 //
@@ -410,4 +432,4 @@ public class ProductService {
 //    }
 //
 //    public void deleteAll() {productRepository.deleteAll();}
-}
+//}

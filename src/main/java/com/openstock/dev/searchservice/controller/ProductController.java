@@ -47,6 +47,11 @@ public class ProductController {
         return productService.getProductById(productId);
     }
 
+    @GetMapping("/getByMaster/{master}")
+    public List<Product> getProductByMaster (@PathVariable String master){
+        return productService.getProductByMaster(master);
+    }
+
     @GetMapping("/country/{country}")
     public List<Product> getProductByCountry(@PathVariable("country") String country) {
         return productService.findByCountry(country);

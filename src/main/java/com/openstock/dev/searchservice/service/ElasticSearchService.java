@@ -28,6 +28,7 @@ public class ElasticSearchService {
                             .match(m -> m
                                     .field("name")
                                     .query(nameKeyword)
+                                    .analyzer("autocomplete")
                             )
                     ), Product.class);
 
@@ -46,21 +47,105 @@ public class ElasticSearchService {
                             .index(ELASTIC_INDEX)
                             .query(q -> q
                                     .bool(b -> b
-                                            .should(sh -> sh.match(m -> m.field("country").query(searchKeyword).fuzziness("AUTO")))
-                                            .should(sh -> sh.match(m -> m.field("type").query(searchKeyword).fuzziness("AUTO")))
-                                            .should(sh -> sh.match(m -> m.field("subType").query(searchKeyword).fuzziness("AUTO")))
-                                            .should(sh -> sh.match(m -> m.field("reg").query(searchKeyword).fuzziness("AUTO")))
-                                            .should(sh -> sh.match(m -> m.field("sub").query(searchKeyword).fuzziness("AUTO")))
-                                            .should(sh -> sh.match(m -> m.field("deno").query(searchKeyword).fuzziness("AUTO")))
-                                            .should(sh -> sh.match(m -> m.field("prod").query(searchKeyword).fuzziness("AUTO")))
-                                            .should(sh -> sh.match(m -> m.field("name").query(searchKeyword).fuzziness("AUTO")))
-                                            .should(sh -> sh.match(m -> m.field("variety").query(searchKeyword).fuzziness("AUTO")))
-                                            .should(sh -> sh.match(m -> m.field("alc").query(searchKeyword).fuzziness("AUTO")))
-                                            .should(sh -> sh.match(m -> m.field("vintage").query(searchKeyword).fuzziness("AUTO")))
+                                                    .should(sh -> sh
+                                                            .match(m -> m
+                                                                    .field("productID")
+                                                                    .query(searchKeyword)
+                                                            )
+                                                    )
+                                                    .should(sh -> sh
+                                                            .match(m -> m
+                                                                    .field("country")
+                                                                    .query(searchKeyword)
+                                                                    .analyzer("autocomplete")
+                                                                    .fuzziness("AUTO")
+                                                            )
+                                                    )
+                                                    .should(sh -> sh
+                                                            .match(m -> m
+                                                                    .field("type")
+                                                                    .query(searchKeyword)
+                                                                    .analyzer("autocomplete")
+                                                                    .fuzziness("AUTO")
+                                                            )
+                                                    )
+                                                    .should(sh -> sh
+                                                            .match(m -> m
+                                                                    .field("subType")
+                                                                    .query(searchKeyword)
+                                                                    .analyzer("autocomplete")
+                                                                    .fuzziness("AUTO")
+                                                            )
+                                                    )
+                                                    .should(sh -> sh
+                                                            .match(m -> m
+                                                                    .field("reg")
+                                                                    .query(searchKeyword)
+                                                                    .analyzer("autocomplete")
+                                                                    .fuzziness("AUTO")
+                                                            )
+                                                    )
+                                                    .should(sh -> sh
+                                                            .match(m -> m
+                                                                    .field("sub")
+                                                                    .query(searchKeyword)
+                                                                    .analyzer("autocomplete")
+                                                                    .fuzziness("AUTO")
+                                                            )
+                                                    )
+                                                    .should(sh -> sh
+                                                            .match(m -> m
+                                                                    .field("deno")
+                                                                    .query(searchKeyword)
+                                                                    .analyzer("autocomplete")
+                                                                    .fuzziness("AUTO")
+                                                            )
+                                                    )
+                                                    .should(sh -> sh
+                                                            .match(m -> m
+                                                                    .field("prod")
+                                                                    .query(searchKeyword)
+                                                                    .analyzer("autocomplete")
+                                                                    .fuzziness("AUTO")
+                                                            )
+                                                    )
+                                                    .should(sh -> sh
+                                                            .match(m -> m
+                                                                    .field("name")
+                                                                    .query(searchKeyword)
+                                                                    .analyzer("autocomplete")
+                                                                    .fuzziness("AUTO")
+                                                            )
+                                                    )
+                                                    .should(sh -> sh
+                                                            .match(m -> m
+                                                                    .field("variety")
+                                                                    .query(searchKeyword)
+                                                                    .analyzer("autocomplete")
+                                                                    .fuzziness("AUTO")
+                                                            )
+                                                    )
+                                                    .should(sh -> sh
+                                                            .match(m -> m
+                                                                    .field("alc")
+                                                                    .query(searchKeyword)
+                                                                    .analyzer("autocomplete")
+                                                                    .fuzziness("AUTO")
+                                                            )
+                                                    )
+                                                    .should(sh -> sh
+                                                            .match(m -> m
+                                                                    .field("vintage")
+                                                                    .query(searchKeyword)
+                                                                    .analyzer("autocomplete")
+                                                                    .fuzziness("AUTO")
+                                                            )
+                                                    )
+                                            // Add similar fuzzy match clauses for other fields
                                     )
                             )
-                            .size(5), // Limiting to top 5 results
-                    Product.class);
+                            .size(5) // Limiting to top 5 results
+                    , Product.class);
 
             return response.hits().hits().stream()
                     .map(Hit::source)
@@ -70,6 +155,49 @@ public class ElasticSearchService {
             return List.of(); // Return an empty list or handle accordingly
         }
     }
+
+//    public List<Product> fetchSuggestions(String searchKeyword) {
+//        try {
+//            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+//                            .index(ELASTIC_INDEX)
+//                            .query(q -> q
+//                                    .bool(b -> b
+//                                            .should(sh -> sh.term(t -> t.field("productID").value(searchKeyword)))
+//                                            .should(sh -> sh.match(m -> m.field("country").query(searchKeyword)
+//                                                    .analyzer("autocomplete").fuzziness("AUTO")))
+//                                            .should(sh -> sh.match(m -> m.field("type").query(searchKeyword)
+//                                                    .analyzer("autocomplete").fuzziness("AUTO")))
+//                                            .should(sh -> sh.match(m -> m.field("subType").query(searchKeyword)
+//                                                    .analyzer("autocomplete").fuzziness("AUTO")))
+//                                            .should(sh -> sh.match(m -> m.field("reg").query(searchKeyword)
+//                                                    .analyzer("autocomplete").fuzziness("AUTO")))
+//                                            .should(sh -> sh.match(m -> m.field("sub").query(searchKeyword)
+//                                                    .analyzer("autocomplete").fuzziness("AUTO")))
+//                                            .should(sh -> sh.match(m -> m.field("deno").query(searchKeyword)
+//                                                    .analyzer("autocomplete").fuzziness("AUTO")))
+//                                            .should(sh -> sh.match(m -> m.field("prod").query(searchKeyword)
+//                                                    .analyzer("autocomplete").fuzziness("AUTO")))
+//                                            .should(sh -> sh.match(m -> m.field("name").query(searchKeyword)
+//                                                    .analyzer("autocomplete").fuzziness("AUTO")))
+//                                            .should(sh -> sh.match(m -> m.field("variety").query(searchKeyword)
+//                                                    .analyzer("autocomplete").fuzziness("AUTO")))
+//                                            .should(sh -> sh.match(m -> m.field("alc").query(searchKeyword)
+//                                                    .analyzer("autocomplete").fuzziness("AUTO")))
+//                                            .should(sh -> sh.match(m -> m.field("vintage").query(searchKeyword)
+//                                                    .analyzer("autocomplete").fuzziness("AUTO")))
+//                                    )
+//                            )
+//                            .size(5), // Limiting to top 5 results
+//                    Product.class);
+//
+//            return response.hits().hits().stream()
+//                    .map(Hit::source)
+//                    .collect(Collectors.toList());
+//        } catch (Exception e) {
+//            // Handle exceptions or log error
+//            return List.of(); // Return an empty list or handle accordingly
+//        }
+//    }
 
 //=====================================================================================================================
 //    private final ElasticsearchOperations elasticsearchOperations;

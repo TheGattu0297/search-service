@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -34,7 +33,9 @@ public class MessageSubscriber {
                 .filter(Objects::nonNull) // Filter out any null values if conversion failed
                 .map(data -> Product.builder()
                         .productID(data.getProductID())
+                        .master(data.getMaster())
                         .country(data.getCountry())
+                        .countryFlag(data.getCountryFlag())
                         .type(data.getType())
                         .subType(data.getSubType())
                         .reg(data.getReg())
