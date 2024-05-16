@@ -144,7 +144,7 @@ public class ElasticSearchService {
                                             // Add similar fuzzy match clauses for other fields
                                     )
                             )
-                            .size(5) // Limiting to top 5 results
+                            .size(10) // Limiting to top 5 results
                     , Product.class);
 
             return response.hits().hits().stream()
