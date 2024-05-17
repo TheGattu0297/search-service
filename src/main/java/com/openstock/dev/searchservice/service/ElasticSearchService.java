@@ -357,104 +357,92 @@ public class ElasticSearchService {
                             .index(ELASTIC_INDEX)
                             .query(q -> q
                                     .bool(b -> b
-                                                    .should(sh -> sh
-                                                            .match(m -> m
-                                                                    .field("productID")
-                                                                    .query(searchKeyword)
-                                                            )
+                                            .should(sh -> sh
+                                                    .term(t -> t
+                                                            .field("productID")
+                                                            .value(searchKeyword)
                                                     )
-                                                    .should(sh -> sh
-                                                            .match(m -> m
-                                                                    .field("country")
-                                                                    .query(searchKeyword)
-                                                                    .analyzer(ELASTIC_AUTOCOMPLETE)
-                                                                    .fuzziness(ELASTIC_AUTO)
-                                                            )
+                                            )
+                                            .should(sh -> sh
+                                                    .match(m -> m
+                                                            .field("country")
+                                                            .query(searchKeyword)
+                                                            .fuzziness("AUTO")
                                                     )
-                                                    .should(sh -> sh
-                                                            .match(m -> m
-                                                                    .field("type")
-                                                                    .query(searchKeyword)
-                                                                    .analyzer(ELASTIC_AUTOCOMPLETE)
-                                                                    .fuzziness(ELASTIC_AUTO)
-                                                            )
+                                            )
+                                            .should(sh -> sh
+                                                    .match(m -> m
+                                                            .field("type")
+                                                            .query(searchKeyword)
+                                                            .fuzziness("AUTO")
                                                     )
-                                                    .should(sh -> sh
-                                                            .match(m -> m
-                                                                    .field("subType")
-                                                                    .query(searchKeyword)
-                                                                    .analyzer(ELASTIC_AUTOCOMPLETE)
-                                                                    .fuzziness(ELASTIC_AUTO)
-                                                            )
+                                            )
+                                            .should(sh -> sh
+                                                    .match(m -> m
+                                                            .field("subType")
+                                                            .query(searchKeyword)
+                                                            .fuzziness("AUTO")
                                                     )
-                                                    .should(sh -> sh
-                                                            .match(m -> m
-                                                                    .field("reg")
-                                                                    .query(searchKeyword)
-                                                                    .analyzer(ELASTIC_AUTOCOMPLETE)
-                                                                    .fuzziness(ELASTIC_AUTO)
-                                                            )
+                                            )
+                                            .should(sh -> sh
+                                                    .match(m -> m
+                                                            .field("reg")
+                                                            .query(searchKeyword)
+                                                            .fuzziness("AUTO")
                                                     )
-                                                    .should(sh -> sh
-                                                            .match(m -> m
-                                                                    .field("sub")
-                                                                    .query(searchKeyword)
-                                                                    .analyzer(ELASTIC_AUTOCOMPLETE)
-                                                                    .fuzziness(ELASTIC_AUTO)
-                                                            )
+                                            )
+                                            .should(sh -> sh
+                                                    .match(m -> m
+                                                            .field("sub")
+                                                            .query(searchKeyword)
+                                                            .fuzziness("AUTO")
                                                     )
-                                                    .should(sh -> sh
-                                                            .match(m -> m
-                                                                    .field("deno")
-                                                                    .query(searchKeyword)
-                                                                    .analyzer(ELASTIC_AUTOCOMPLETE)
-                                                                    .fuzziness(ELASTIC_AUTO)
-                                                            )
+                                            )
+                                            .should(sh -> sh
+                                                    .match(m -> m
+                                                            .field("deno")
+                                                            .query(searchKeyword)
+                                                            .fuzziness("AUTO")
                                                     )
-                                                    .should(sh -> sh
-                                                            .match(m -> m
-                                                                    .field("prod")
-                                                                    .query(searchKeyword)
-                                                                    .analyzer(ELASTIC_AUTOCOMPLETE)
-                                                                    .fuzziness(ELASTIC_AUTO)
-                                                            )
+                                            )
+                                            .should(sh -> sh
+                                                    .match(m -> m
+                                                            .field("prod")
+                                                            .query(searchKeyword)
+                                                            .fuzziness("AUTO")
                                                     )
-                                                    .should(sh -> sh
-                                                            .match(m -> m
-                                                                    .field("name")
-                                                                    .query(searchKeyword)
-                                                                    .analyzer(ELASTIC_AUTOCOMPLETE)
-                                                                    .fuzziness(ELASTIC_AUTO)
-                                                            )
+                                            )
+                                            .should(sh -> sh
+                                                    .match(m -> m
+                                                            .field("name")
+                                                            .query(searchKeyword)
+                                                            .fuzziness("AUTO")
                                                     )
-                                                    .should(sh -> sh
-                                                            .match(m -> m
-                                                                    .field("variety")
-                                                                    .query(searchKeyword)
-                                                                    .analyzer(ELASTIC_AUTOCOMPLETE)
-                                                                    .fuzziness(ELASTIC_AUTO)
-                                                            )
+                                            )
+                                            .should(sh -> sh
+                                                    .match(m -> m
+                                                            .field("variety")
+                                                            .query(searchKeyword)
+                                                            .fuzziness("AUTO")
                                                     )
-                                                    .should(sh -> sh
-                                                            .match(m -> m
-                                                                    .field("alc")
-                                                                    .query(searchKeyword)
-                                                                    .analyzer(ELASTIC_AUTOCOMPLETE)
-                                                                    .fuzziness(ELASTIC_AUTO)
-                                                            )
+                                            )
+                                            .should(sh -> sh
+                                                    .match(m -> m
+                                                            .field("alc")
+                                                            .query(searchKeyword)
+                                                            .fuzziness("AUTO")
                                                     )
-                                                    .should(sh -> sh
-                                                            .match(m -> m
-                                                                    .field("vintage")
-                                                                    .query(searchKeyword)
-                                                                    .analyzer(ELASTIC_AUTOCOMPLETE)
-                                                                    .fuzziness(ELASTIC_AUTO)
-                                                            )
+                                            )
+                                            .should(sh -> sh
+                                                    .match(m -> m
+                                                            .field("vintage")
+                                                            .query(searchKeyword)
+                                                            .fuzziness("AUTO")
                                                     )
-                                            // Add similar fuzzy match clauses for other fields
+                                            )
                                     )
                             )
-                            .size(10) // Limiting to top 5 results
+                            .size(10) // Limiting to top 10 results
                     , Product.class);
 
             return response.hits().hits().stream()
@@ -465,6 +453,7 @@ public class ElasticSearchService {
             return List.of(); // Return an empty list or handle accordingly
         }
     }
+
 }
 
 //=====================================================================================================================
