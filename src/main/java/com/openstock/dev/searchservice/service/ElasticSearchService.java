@@ -132,9 +132,9 @@ public class ElasticSearchService {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .match(m -> m
-                                    .field("country")
-                                    .query(keyword)
+                            .term(t -> t
+                                    .field("country.raw") // Ensure the field is a keyword type
+                                    .value(keyword)
                             )
                     ).size(5000), Product.class);
             return response.hits().hits().stream()
@@ -151,9 +151,9 @@ public class ElasticSearchService {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .match(m -> m
-                                    .field("type")
-                                    .query(keyword)
+                            .term(t -> t
+                                    .field("type.raw") // Ensure the field is a keyword type
+                                    .value(keyword)
                             )
                     ).size(5000), Product.class);
             return response.hits().hits().stream()
@@ -170,9 +170,9 @@ public class ElasticSearchService {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .match(m -> m
-                                    .field("subType")
-                                    .query(keyword)
+                            .term(t -> t
+                                    .field("subType.raw") // Ensure the field is a keyword type
+                                    .value(keyword)
                             )
                     ).size(5000), Product.class);
             return response.hits().hits().stream()
@@ -189,9 +189,9 @@ public class ElasticSearchService {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .match(m -> m
-                                    .field("reg")
-                                    .query(keyword)
+                            .term(t -> t
+                                    .field("reg.raw") // Ensure the field is a keyword type
+                                    .value(keyword)
                             )
                     ).size(5000), Product.class);
             return response.hits().hits().stream()
@@ -208,9 +208,9 @@ public class ElasticSearchService {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .match(m -> m
-                                    .field("sub")
-                                    .query(keyword)
+                            .term(t -> t
+                                    .field("sub.raw") // Ensure the field is a keyword type
+                                    .value(keyword)
                             )
                     ).size(5000), Product.class);
             return response.hits().hits().stream()
@@ -227,9 +227,9 @@ public class ElasticSearchService {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .match(m -> m
-                                    .field("deno")
-                                    .query(keyword)
+                            .term(t -> t
+                                    .field("deno.raw") // Ensure the field is a keyword type
+                                    .value(keyword)
                             )
                     ).size(5000), Product.class);
             return response.hits().hits().stream()
@@ -246,9 +246,9 @@ public class ElasticSearchService {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .match(m -> m
-                                    .field("prod")
-                                    .query(keyword)
+                            .term(t -> t
+                                    .field("prod.raw") // Ensure the field is a keyword type
+                                    .value(keyword)
                             )
                     ).size(5000), Product.class);
             return response.hits().hits().stream()
@@ -267,9 +267,9 @@ public class ElasticSearchService {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .match(m -> m
-                                    .field("name")
-                                    .query(keyword)
+                            .term(t -> t
+                                    .field("name.raw") // Ensure the field is a keyword type
+                                    .value(keyword)
                             )
                     ).size(5000), Product.class);
             return response.hits().hits().stream()
@@ -286,9 +286,9 @@ public class ElasticSearchService {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .match(m -> m
-                                    .field("variety")
-                                    .query(keyword)
+                            .term(t -> t
+                                    .field("variety.raw") // Ensure the field is a keyword type
+                                    .value(keyword)
                             )
                     ).size(5000), Product.class);
             return response.hits().hits().stream()
@@ -305,9 +305,9 @@ public class ElasticSearchService {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .match(m -> m
-                                    .field("alc")
-                                    .query(keyword)
+                            .term(t -> t
+                                    .field("alc.raw") // Ensure the field is a keyword type
+                                    .value(keyword)
                             )
                     ).size(5000), Product.class);
             return response.hits().hits().stream()
@@ -324,9 +324,9 @@ public class ElasticSearchService {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .match(m -> m
-                                    .field("vintage")
-                                    .query(keyword)
+                            .term(t -> t
+                                    .field("vintage.raw") // Ensure the field is a keyword type
+                                    .value(keyword)
                             )
                     ).size(5000), Product.class);
             return response.hits().hits().stream()
