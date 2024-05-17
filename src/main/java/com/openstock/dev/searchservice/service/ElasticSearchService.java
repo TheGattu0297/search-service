@@ -117,7 +117,7 @@ public class ElasticSearchService {
                                     .field("master")
                                     .query(keyword)
                             )
-                    ), Product.class);
+                    ).size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -136,7 +136,7 @@ public class ElasticSearchService {
                                     .field("country")
                                     .query(keyword)
                             )
-                    ), Product.class);
+                    ).size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -155,7 +155,7 @@ public class ElasticSearchService {
                                     .field("type")
                                     .query(keyword)
                             )
-                    ), Product.class);
+                    ).size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -174,7 +174,7 @@ public class ElasticSearchService {
                                     .field("subType")
                                     .query(keyword)
                             )
-                    ), Product.class);
+                    ).size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -193,7 +193,7 @@ public class ElasticSearchService {
                                     .field("reg")
                                     .query(keyword)
                             )
-                    ), Product.class);
+                    ).size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -212,7 +212,7 @@ public class ElasticSearchService {
                                     .field("sub")
                                     .query(keyword)
                             )
-                    ), Product.class);
+                    ).size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -231,7 +231,7 @@ public class ElasticSearchService {
                                     .field("deno")
                                     .query(keyword)
                             )
-                    ), Product.class);
+                    ).size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -250,7 +250,7 @@ public class ElasticSearchService {
                                     .field("prod")
                                     .query(keyword)
                             )
-                    ), Product.class);
+                    ).size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -271,7 +271,7 @@ public class ElasticSearchService {
                                     .field("name")
                                     .query(keyword)
                             )
-                    ), Product.class);
+                    ).size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -290,7 +290,7 @@ public class ElasticSearchService {
                                     .field("variety")
                                     .query(keyword)
                             )
-                    ), Product.class);
+                    ).size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -309,7 +309,7 @@ public class ElasticSearchService {
                                     .field("alc")
                                     .query(keyword)
                             )
-                    ), Product.class);
+                    ).size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -328,7 +328,7 @@ public class ElasticSearchService {
                                     .field("vintage")
                                     .query(keyword)
                             )
-                    ), Product.class);
+                    ).size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
