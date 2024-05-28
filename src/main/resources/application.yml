@@ -3,7 +3,7 @@ server:
   port: 8080
 
 elastic:
-  server_url: search-service-11f6fa.es.eu-west-2.aws.cloud.es.io
+  server_url: <server_url>
   server_port: 9243
   api_key: <api_key>
   connection_scheme: https
