@@ -3,8 +3,10 @@ server:
   port: 8080
 
 elastic:
-  server_url: <server_url>
+#  server_url: <server_url>
+  server_url: openstock-search-service.es.eu-west-2.aws.cloud.es.io
   server_port: 9243
+#  api_key: <api_key>
   api_key: <api_key>
   connection_scheme: https
 
