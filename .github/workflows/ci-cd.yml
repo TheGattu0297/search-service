@@ -16,10 +16,10 @@ jobs:
           distribution: 'corretto'
           java-version: '21'
 
-#      - name: Replace placeholders in application.yml
-#        run: |
-#          sed -i "s|<server_url>|${{ secrets.ELASTIC_SERVER_URL }}|g" src/main/resources/application.yml
-#          sed -i "s|<api_key>|${{ secrets.ELASTIC_API_KEY }}|g" src/main/resources/application.yml
+      - name: Replace placeholders in application.yml
+        run: |
+          sed -i "s|<server_url>|${{ secrets.ELASTIC_SERVER_URL }}|g" src/main/resources/application.yml
+          sed -i "s|<api_key>|${{ secrets.ELASTIC_API_KEY }}|g" src/main/resources/application.yml
 
       - name: Build Project
         run: mvn clean install -DskipTests
