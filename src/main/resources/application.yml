@@ -1,19 +1,21 @@
 server:
-#  port: 8081
-  port: 8080
+  port: 8081
+#  port: 8080
 
 elastic:
-#  server_url: <server_url>
-  server_url: openstock-search-service.es.eu-west-2.aws.cloud.es.io
+  server_url: <server_url>
+#  server_url: openstock-search-service.es.eu-west-2.aws.cloud.es.io
   server_port: 9243
-#  api_key: <api_key>
   api_key: <api_key>
+#  api_key: Q1BYQXhJOEJUcW5nNHB5TE4zWGs6TnpJRUhXcHRUREN2QWkxbUJGanM1Zw==
   connection_scheme: https
 
 kafka:
   url: ec2-35-178-197-217.eu-west-2.compute.amazonaws.com
+#  url: localhost
   port: 9092
 
 spring:
   kafka:
     bootstrap-servers: ec2-35-178-197-217.eu-west-2.compute.amazonaws.com
+#    bootstrap-servers: localhost
