@@ -11,9 +11,9 @@ elastic:
   connection_scheme: https
 
 kafka:
-  url: <kafka_url>
+  url: ec2-35-178-197-217.eu-west-2.compute.amazonaws.com
   port: 9092
 
 spring:
   kafka:
-    bootstrap-servers: <kafka_url>
+    bootstrap-servers: ec2-35-178-197-217.eu-west-2.compute.amazonaws.com
