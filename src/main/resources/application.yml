@@ -19,3 +19,12 @@ spring:
   kafka:
     bootstrap-servers: ec2-35-178-197-217.eu-west-2.compute.amazonaws.com
 #    bootstrap-servers: localhost
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
