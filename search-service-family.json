@@ -1,13 +1,13 @@
 {
-  "taskDefinitionArn": "arn:aws:ecs:eu-west-2:891377108134:task-definition/product-service-family:15",
+  "taskDefinitionArn": "arn:aws:ecs:eu-west-2:891377108134:task-definition/search-service-family:16",
   "containerDefinitions": [
     {
-      "name": "product-service-container",
-      "image": "891377108134.dkr.ecr.eu-west-2.amazonaws.com/product-service:eefa5f861e996bdab40255b02ada9f6b6f96f6a5",
+      "name": "search-service-container",
+      "image": "891377108134.dkr.ecr.eu-west-2.amazonaws.com/search-service:f11b423594e47e64a1e25bd5e4ffd70560ccc9fa",
       "cpu": 0,
       "portMappings": [
         {
-          "name": "product-service-port",
+          "name": "search-service-port",
           "containerPort": 8080,
           "hostPort": 8080,
           "protocol": "tcp",
@@ -22,7 +22,7 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-create-group": "true",
-          "awslogs-group": "/ecs/product-service-family",
+          "awslogs-group": "/ecs/search-service-family",
           "awslogs-region": "eu-west-2",
           "awslogs-stream-prefix": "ecs"
         }
@@ -30,11 +30,11 @@
       "systemControls": []
     }
   ],
-  "family": "product-service-family",
+  "family": "search-service-family",
   "taskRoleArn": "arn:aws:iam::891377108134:role/ecs-task-execution-role-secret",
   "executionRoleArn": "arn:aws:iam::891377108134:role/ecs-task-execution-role-secret",
   "networkMode": "awsvpc",
-  "revision": 15,
+  "revision": 16,
   "volumes": [],
   "status": "ACTIVE",
   "requiresAttributes": [
@@ -80,7 +80,7 @@
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
   },
-  "registeredAt": "2024-05-28T12:42:06.331Z",
+  "registeredAt": "2024-06-04T10:41:29.236Z",
   "registeredBy": "arn:aws:iam::891377108134:user/Vishal",
   "tags": []
 }
