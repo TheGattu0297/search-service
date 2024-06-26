@@ -18,6 +18,11 @@ public class SearchController {
         this.elasticSearchService = elasticSearchService;
     }
 
+    @GetMapping(value = "/health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/save")
     public ResponseEntity<String> addProduct (@RequestBody Product product){
         elasticSearchService.saveProduct(product);
