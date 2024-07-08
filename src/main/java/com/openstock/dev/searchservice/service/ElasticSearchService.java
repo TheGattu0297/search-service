@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.openstock.dev.searchservice.constants.Constants.*;
+import static com.openstock.dev.searchservice.constants.Constants.ELASTIC_INDEX;
 
 @Slf4j
 @Service
@@ -305,8 +305,8 @@ public class ElasticSearchService {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .term(t -> t
-                                    .field("alc.raw") // Ensure the field is a keyword type
+                            .term(m -> m
+                                    .field("alc.raw")
                                     .value(keyword)
                             )
                     ).size(5000), Product.class);

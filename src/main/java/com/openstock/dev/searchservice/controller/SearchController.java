@@ -104,7 +104,8 @@ public class SearchController {
 
     @GetMapping("/alc/{alcoholPercentage}")
     public List<Product> getProductsByAlcoholPercentage(@PathVariable("alcoholPercentage") String alcoholPercentage) {
-        return elasticSearchService.findByAlc(alcoholPercentage);
+        String alc = alcoholPercentage.replace("p", "%");
+        return elasticSearchService.findByAlc(alc);
     }
 
     @GetMapping("/vintage/{vintage}")
