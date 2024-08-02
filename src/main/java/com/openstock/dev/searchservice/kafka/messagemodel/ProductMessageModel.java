@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProductMessageModel {
     private String productID;
+    private String master;
     private String country;
+    private String countryFlag;
     private String type;
     private String subType;
     private String reg;

@@ -1,0 +1,86 @@
+{
+  "taskDefinitionArn": "arn:aws:ecs:eu-west-2:891377108134:task-definition/search-service-family:16",
+  "containerDefinitions": [
+    {
+      "name": "search-service-container",
+      "image": "891377108134.dkr.ecr.eu-west-2.amazonaws.com/search-service:f11b423594e47e64a1e25bd5e4ffd70560ccc9fa",
+      "cpu": 0,
+      "portMappings": [
+        {
+          "name": "search-service-port",
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "essential": true,
+      "environment": [],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-create-group": "true",
+          "awslogs-group": "/ecs/search-service-family",
+          "awslogs-region": "eu-west-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "systemControls": []
+    }
+  ],
+  "family": "search-service-family",
+  "taskRoleArn": "arn:aws:iam::891377108134:role/ecs-task-execution-role-secret",
+  "executionRoleArn": "arn:aws:iam::891377108134:role/ecs-task-execution-role-secret",
+  "networkMode": "awsvpc",
+  "revision": 16,
+  "volumes": [],
+  "status": "ACTIVE",
+  "requiresAttributes": [
+    {
+      "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+    },
+    {
+      "name": "ecs.capability.execution-role-awslogs"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.ecr-auth"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.task-iam-role"
+    },
+    {
+      "name": "ecs.capability.execution-role-ecr-pull"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+    },
+    {
+      "name": "ecs.capability.task-eni"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
+    }
+  ],
+  "placementConstraints": [],
+  "compatibilities": [
+    "EC2",
+    "FARGATE"
+  ],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "1024",
+  "memory": "3072",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "registeredAt": "2024-06-04T10:41:29.236Z",
+  "registeredBy": "arn:aws:iam::891377108134:user/Vishal",
+  "tags": []
+}

@@ -1,74 +1,159 @@
-PUT /products
+//PUT /products
 {
   "settings": {
     "analysis": {
-      "analyzer": {
-        "autocomplete": {
-          "type": "os_custom",
-          "tokenizer": "standard",
-          "filter": ["lowercase", "autocomplete_filter"]
-        }
-      },
-      "filter": {
-        "autocomplete_filter": {
+      "tokenizer": {
+        "edge_ngram_tokenizer": {
           "type": "edge_ngram",
           "min_gram": 1,
-          "max_gram": 20
+          "max_gram": 20,
+          "token_chars": [
+            "letter",
+            "digit",
+            "punctuation",
+            "symbol"
+          ]
+        }
+      },
+      "analyzer": {
+        "autocomplete": {
+          "type": "custom",
+          "tokenizer": "edge_ngram_tokenizer",
+          "filter": ["lowercase"]
         }
       }
     }
   },
   "mappings": {
     "properties": {
+      "productID": {
+        "type": "keyword"
+      },
+      "master": {
+        "type": "text",
+        "index": true
+      },
       "country": {
         "type": "text",
         "analyzer": "autocomplete",
-        "search_analyzer": "standard"
+        "search_analyzer": "standard",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
+      },
+      "countryFlag": {
+        "type": "text",
+        "index": false
       },
       "type": {
         "type": "text",
         "analyzer": "autocomplete",
-        "search_analyzer": "standard"
+        "search_analyzer": "standard",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
       },
-      "region": {
+      "subType": {
         "type": "text",
         "analyzer": "autocomplete",
-        "search_analyzer": "standard"
+        "search_analyzer": "standard",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
       },
-      "subRegion": {
+      "reg": {
         "type": "text",
         "analyzer": "autocomplete",
-        "search_analyzer": "standard"
+        "search_analyzer": "standard",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
       },
-      "denomination": {
+      "sub": {
         "type": "text",
         "analyzer": "autocomplete",
-        "search_analyzer": "standard"
+        "search_analyzer": "standard",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
       },
-      "producer": {
+      "deno": {
         "type": "text",
         "analyzer": "autocomplete",
-        "search_analyzer": "standard"
+        "search_analyzer": "standard",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
+      },
+      "prod": {
+        "type": "text",
+        "analyzer": "autocomplete",
+        "search_analyzer": "standard",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
       },
       "name": {
         "type": "text",
         "analyzer": "autocomplete",
-        "search_analyzer": "standard"
+        "search_analyzer": "standard",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
       },
       "variety": {
         "type": "text",
         "analyzer": "autocomplete",
-        "search_analyzer": "standard"
+        "search_analyzer": "standard",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
       },
-      "alcoholPercentage": {
+      "alc": {
         "type": "text",
         "analyzer": "autocomplete",
-        "search_analyzer": "standard"
+        "search_analyzer": "standard",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
       },
       "vintage": {
         "type": "text",
         "analyzer": "autocomplete",
-        "search_analyzer": "standard"
+        "search_analyzer": "standard",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
+      },
+      "info": {
+        "type": "text",
+        "index": false
+      },
+      "img": {
+        "type": "text",
+        "index": false
       }
     }
   }

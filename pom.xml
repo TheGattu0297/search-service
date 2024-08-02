@@ -23,6 +23,10 @@
             <version>3.2.5</version>
         </dependency>
         <dependency>
+            <groupId>co.elastic.clients</groupId>
+            <artifactId>elasticsearch-java</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
             <version>7.17.20</version>
@@ -74,6 +78,7 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>search-service</finalName>
     </build>
 
 </project>
