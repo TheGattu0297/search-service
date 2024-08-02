@@ -5,8 +5,9 @@ import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import com.openstock.dev.searchservice.model.Product;
+import com.openstock.dev.searchservice.entity.Product;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -96,7 +97,9 @@ public class ElasticSearchService {
         }
     }
 
+    @Cacheable(key = "#productId",value = "Product",unless = "#result == null")
     public Product getProductById(String productId) {
+        log.info("DB CALL");
         try {
             return elasticsearchClient.get(g -> g
                             .index(ELASTIC_INDEX)
@@ -108,7 +111,9 @@ public class ElasticSearchService {
         }
     }
 
+    @Cacheable(key = "#keyword", value = "ProductsByMaster", unless = "#result == null || #result.isEmpty()")
     public List<Product> getProductByMaster(String keyword) {
+        log.info("DB CALL");
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -151,9 +156,9 @@ public class ElasticSearchService {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .term(t -> t
+                            .match(t -> t
                                     .field("type.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
+                                    .query(keyword)
                             )
                     ).size(5000), Product.class);
             return response.hits().hits().stream()
@@ -170,9 +175,9 @@ public class ElasticSearchService {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .term(t -> t
+                            .match(t -> t
                                     .field("subType.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
+                                    .query(keyword)
                             )
                     ).size(5000), Product.class);
             return response.hits().hits().stream()
@@ -351,6 +356,114 @@ public class ElasticSearchService {
         }
     }
 
+//    public List<Product> fetchSuggestions(String searchKeyword) {
+//        try {
+//            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+//                            .index(ELASTIC_INDEX)
+//                            .query(q -> q
+//                                    .bool(b -> b
+//                                            .should(sh -> sh
+//                                                    .term(t -> t
+//                                                            .field("productID")
+//                                                            .value(searchKeyword)
+//                                                    )
+//                                            ).should(sh -> sh
+//                                                    .term(m -> m
+//                                                            .field("master")
+//                                                            .value(searchKeyword)
+//                                                    )
+//                                            )
+//                                            .should(sh -> sh
+//                                                    .match(m -> m
+//                                                            .field("country")
+//                                                            .query(searchKeyword)
+//                                                            .fuzziness("AUTO")
+//                                                    )
+//                                            )
+//                                            .should(sh -> sh
+//                                                    .match(m -> m
+//                                                            .field("type")
+//                                                            .query(searchKeyword)
+//                                                            .fuzziness("AUTO")
+//                                                    )
+//                                            )
+//                                            .should(sh -> sh
+//                                                    .match(m -> m
+//                                                            .field("subType")
+//                                                            .query(searchKeyword)
+//                                                            .fuzziness("AUTO")
+//                                                    )
+//                                            )
+//                                            .should(sh -> sh
+//                                                    .match(m -> m
+//                                                            .field("reg")
+//                                                            .query(searchKeyword)
+//                                                            .fuzziness("AUTO")
+//                                                    )
+//                                            )
+//                                            .should(sh -> sh
+//                                                    .match(m -> m
+//                                                            .field("sub")
+//                                                            .query(searchKeyword)
+//                                                            .fuzziness("AUTO")
+//                                                    )
+//                                            )
+//                                            .should(sh -> sh
+//                                                    .match(m -> m
+//                                                            .field("deno")
+//                                                            .query(searchKeyword)
+//                                                            .fuzziness("AUTO")
+//                                                    )
+//                                            )
+//                                            .should(sh -> sh
+//                                                    .match(m -> m
+//                                                            .field("prod")
+//                                                            .query(searchKeyword)
+//                                                            .fuzziness("AUTO")
+//                                                    )
+//                                            )
+//                                            .should(sh -> sh
+//                                                    .match(m -> m
+//                                                            .field("name")
+//                                                            .query(searchKeyword)
+//                                                            .fuzziness("AUTO")
+//                                                    )
+//                                            )
+//                                            .should(sh -> sh
+//                                                    .match(m -> m
+//                                                            .field("variety")
+//                                                            .query(searchKeyword)
+//                                                            .fuzziness("AUTO")
+//                                                    )
+//                                            )
+//                                            .should(sh -> sh
+//                                                    .match(m -> m
+//                                                            .field("alc")
+//                                                            .query(searchKeyword)
+//                                                            .fuzziness("AUTO")
+//                                                    )
+//                                            )
+//                                            .should(sh -> sh
+//                                                    .match(m -> m
+//                                                            .field("vintage")
+//                                                            .query(searchKeyword)
+//                                                            .fuzziness("AUTO")
+//                                                    )
+//                                            )
+//                                    )
+//                            )
+//                            .size(100) // Limiting to top 100 results
+//                    , Product.class);
+//
+//            return response.hits().hits().stream()
+//                    .map(Hit::source)
+//                    .toList();
+//        } catch (Exception e) {
+//            // Handle exceptions or log error
+//            return List.of(); // Return an empty list or handle accordingly
+//        }
+//    }
+
     public List<Product> fetchSuggestions(String searchKeyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
@@ -364,94 +477,32 @@ public class ElasticSearchService {
                                                     )
                                             )
                                             .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("country")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
+                                                    .term(t -> t
+                                                            .field("master")
+                                                            .value(searchKeyword)
                                                     )
                                             )
                                             .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("type")
+                                                    .multiMatch(mm -> mm
                                                             .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("subType")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("reg")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("sub")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("deno")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("prod")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("name")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("variety")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("alc")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("vintage")
-                                                            .query(searchKeyword)
+                                                            .fields("prod^5", "deno^5", "vintage^5",
+                                                                    "country^3", "name^3", "reg^3", "type^3",
+                                                                    "subType", "sub", "variety", "alc")
                                                             .fuzziness("AUTO")
                                                     )
                                             )
                                     )
                             )
-                            .size(10) // Limiting to top 10 results
-                    , Product.class);
-
+                            .size(100), // Limiting to top 100 results
+                    Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            // Handle exceptions or log error
-            return List.of(); // Return an empty list or handle accordingly
+            log.error("Error performing search for query - {}: {}", searchKeyword, e.getMessage(), e);
+            return List.of();
         }
     }
+
 
 }

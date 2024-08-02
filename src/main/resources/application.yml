@@ -19,3 +19,7 @@ spring:
   kafka:
 #    bootstrap-servers: ec2-18-175-61-146.eu-west-2.compute.amazonaws.com
     bootstrap-servers: <kafka_url>
+
+  redis:
+#    uri: redis://default:ymT7w9BJ99CIFpLES8nWrso9PU5Dz2a8@redis-11002.c72.eu-west-1-2.ec2.redns.redis-cloud.com:11002
+    uri: redis://<redis_user>:<redis_password>@redis-11002.c72.eu-west-1-2.ec2.redns.redis-cloud.com:11002

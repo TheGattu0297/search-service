@@ -1,6 +1,6 @@
 package com.openstock.dev.searchservice.controller;
 
-import com.openstock.dev.searchservice.model.Product;
+import com.openstock.dev.searchservice.entity.Product;
 import com.openstock.dev.searchservice.service.ElasticSearchService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -21,7 +21,9 @@ jobs:
           sed -i "s|<server_url>|${{ secrets.ELASTIC_SERVER_URL }}|g" src/main/resources/application.yml
           sed -i "s|<api_key>|${{ secrets.ELASTIC_API_KEY }}|g" src/main/resources/application.yml
           sed -i "s|<kafka_url>|${{ secrets.KAFKA_URL }}|g" src/main/resources/application.yml
-
+          sed -i "s|<redis_user>|${{ secrets.REDIS_USER }}|g" src/main/resources/application.yml
+          sed -i "s|<redis_password>|${{ secrets.REDIS_PASSWORD }}|g" src/main/resources/application.yml
+          
       - name: Build Project
         run: mvn clean install -DskipTests
 

@@ -2,7 +2,7 @@ package com.openstock.dev.searchservice.kafka.subscribers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openstock.dev.searchservice.kafka.messagemodel.ProductMessageModel;
-import com.openstock.dev.searchservice.model.Product;
+import com.openstock.dev.searchservice.entity.Product;
 import com.openstock.dev.searchservice.service.ElasticSearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
