@@ -503,6 +503,4 @@ public class ElasticSearchService {
             return List.of();
         }
     }
-
-
 }
