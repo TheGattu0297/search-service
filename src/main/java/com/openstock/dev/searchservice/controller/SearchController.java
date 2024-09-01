@@ -32,7 +32,7 @@ public class SearchController {
 
     @GetMapping("/getAll")
     public Iterable<Product> getAllProducts (){
-        return elasticSearchService.getProducts();
+        return elasticSearchService.getAllProducts();
     }
 
     @GetMapping("/getAllInRange")
@@ -54,58 +54,58 @@ public class SearchController {
 
     @GetMapping("/country/{country}")
     public List<Product> getProductByCountry(@PathVariable("country") String country) {
-        return elasticSearchService.findByCountry(country);
+        return elasticSearchService.getProductsByCountry(country);
     }
 
     @GetMapping("/type/{type}")
     public List<Product> getProductsByType(@PathVariable("type") String type) {
-        return elasticSearchService.findByType(type);
+        return elasticSearchService.getProductsByType(type);
     }
 
     @GetMapping("/subType/{subType}")
     public List<Product> getProductsBySubType(@PathVariable("subType") String subType) {
-        return elasticSearchService.findBySubType(subType);
+        return elasticSearchService.getProductsBySubType(subType);
     }
 
     @GetMapping("/reg/{region}")
     public List<Product> getProductsByRegion(@PathVariable("region") String region) {
-        return elasticSearchService.findByReg(region);
+        return elasticSearchService.getProductsByReg(region);
     }
 
     @GetMapping("/sub/{subRegion}")
     public List<Product> getProductsBySubRegion(@PathVariable("subRegion") String subRegion) {
-        return elasticSearchService.findBySub(subRegion);
+        return elasticSearchService.getProductsBySub(subRegion);
     }
 
     @GetMapping("/deno/{denomination}")
     public List<Product> getProductsByDenomination(@PathVariable("denomination") String denomination) {
-        return elasticSearchService.findByDeno(denomination);
+        return elasticSearchService.getProductsByDeno(denomination);
     }
 
     @GetMapping("/prod/{producer}")
     public List<Product> getProductsByProducer(@PathVariable("producer") String producer) {
-        return elasticSearchService.findByProd(producer);
+        return elasticSearchService.getProductsByProd(producer);
     }
 
     @GetMapping("/name/{name}")
     public List<Product> getProductsByName(@PathVariable("name") String name) {
-        return elasticSearchService.findByName(name);
+        return elasticSearchService.getProductsByName(name);
     }
 
     @GetMapping("/variety/{variety}")
     public List<Product> getProductsByVariety(@PathVariable("variety") String variety) {
-        return elasticSearchService.findByVariety(variety);
+        return elasticSearchService.getProductsByVariety(variety);
     }
 
     @GetMapping("/alc/{alcoholPercentage}")
     public List<Product> getProductsByAlcoholPercentage(@PathVariable("alcoholPercentage") String alcoholPercentage) {
         String alc = alcoholPercentage + "%";
-        return elasticSearchService.findByAlc(alc);
+        return elasticSearchService.getProductsByAlc(alc);
     }
 
     @GetMapping("/vintage/{vintage}")
     public List<Product> getProductsByVintage(@PathVariable("vintage") String vintage) {
-        return elasticSearchService.findByVintage(vintage);
+        return elasticSearchService.getProductsByVintage(vintage);
     }
 
     @DeleteMapping("/deleteAll")

@@ -6,6 +6,7 @@ import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.openstock.dev.searchservice.entity.Product;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -15,14 +16,12 @@ import java.util.List;
 import static com.openstock.dev.searchservice.constants.Constants.ELASTIC_INDEX;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class ElasticSearchService {
 
     private final ElasticsearchClient elasticsearchClient;
 
-    public ElasticSearchService(ElasticsearchClient elasticsearchClient) {
-        this.elasticsearchClient = elasticsearchClient;
-    }
 
     /**
      * Persist the individual Product entity in the Elasticsearch cluster
@@ -63,7 +62,8 @@ public class ElasticSearchService {
         }
     }
 
-    public List<Product> getProducts() {
+    @Cacheable(key = "'getAllProducts'", value = "AllProducts", unless = "#result == null")
+    public List<Product> getAllProducts() {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -79,6 +79,8 @@ public class ElasticSearchService {
         }
     }
 
+    @Cacheable(key = "'getProductsInRange:' + #from + '_' + #size", value = "AllProductsPaginated",
+            unless = "#result == null")
     public Iterable<Product> getProductsInRange(int from, int size) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
@@ -97,7 +99,7 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#productId",value = "Product",unless = "#result == null")
+    @Cacheable(key = "#productId", value = "Product", unless = "#result == null")
     public Product getProductById(String productId) {
         log.info("DB CALL");
         try {
@@ -111,7 +113,7 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#keyword", value = "ProductsByMaster", unless = "#result == null || #result.isEmpty()")
+    @Cacheable(key = "#keyword", value = "ProductsByMaster", unless = "#result == null")
     public List<Product> getProductByMaster(String keyword) {
         log.info("DB CALL");
         try {
@@ -132,7 +134,8 @@ public class ElasticSearchService {
         }
     }
 
-    public List<Product> findByCountry(String keyword) {
+    @Cacheable(key = "#keyword", value = "ProductsByCountry", unless = "#result == null")
+    public List<Product> getProductsByCountry(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -151,7 +154,8 @@ public class ElasticSearchService {
         }
     }
 
-    public List<Product> findByType(String keyword) {
+    @Cacheable(key = "#keyword", value = "ProductsByType", unless = "#result == null")
+    public List<Product> getProductsByType(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -170,7 +174,8 @@ public class ElasticSearchService {
         }
     }
 
-    public List<Product> findBySubType(String keyword) {
+    @Cacheable(key = "#keyword", value = "ProductsBySubType", unless = "#result == null")
+    public List<Product> getProductsBySubType(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -189,7 +194,8 @@ public class ElasticSearchService {
         }
     }
 
-    public List<Product> findByReg(String keyword) {
+    @Cacheable(key = "#keyword", value = "ProductsByRegion", unless = "#result == null")
+    public List<Product> getProductsByReg(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -208,7 +214,8 @@ public class ElasticSearchService {
         }
     }
 
-    public List<Product> findBySub(String keyword) {
+    @Cacheable(key = "#keyword", value = "ProductsBySubRegion", unless = "#result == null")
+    public List<Product> getProductsBySub(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -227,7 +234,8 @@ public class ElasticSearchService {
         }
     }
 
-    public List<Product> findByDeno(String keyword) {
+    @Cacheable(key = "#keyword", value = "ProductsByDenomination", unless = "#result == null")
+    public List<Product> getProductsByDeno(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -246,7 +254,8 @@ public class ElasticSearchService {
         }
     }
 
-    public List<Product> findByProd(String keyword) {
+    @Cacheable(key = "#keyword", value = "ProductsByProducer", unless = "#result == null")
+    public List<Product> getProductsByProd(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -265,9 +274,8 @@ public class ElasticSearchService {
         }
     }
 
-
-
-    public List<Product> findByName(String keyword) {
+    @Cacheable(key = "#keyword", value = "ProductsByVariety", unless = "#result == null")
+    public List<Product> getProductsByName(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -286,7 +294,8 @@ public class ElasticSearchService {
         }
     }
 
-    public List<Product> findByVariety(String keyword) {
+    @Cacheable(key = "#keyword", value = "ProductsByVariety", unless = "#result == null")
+    public List<Product> getProductsByVariety(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -305,7 +314,8 @@ public class ElasticSearchService {
         }
     }
 
-    public List<Product> findByAlc(String keyword) {
+    @Cacheable(key = "#keyword", value = "ProductsByAlcohol", unless = "#result == null")
+    public List<Product> getProductsByAlc(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -324,7 +334,8 @@ public class ElasticSearchService {
         }
     }
 
-    public List<Product> findByVintage(String keyword) {
+    @Cacheable(key = "#keyword", value = "ProductsByVintage", unless = "#result == null")
+    public List<Product> getProductsByVintage(String keyword) {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)

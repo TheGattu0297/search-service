@@ -54,10 +54,10 @@ public class RedisConfig {
     @Bean
     public CacheManager cacheManager() throws URISyntaxException {
         RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofDays(7)
+                .entryTtl(Duration.ofDays(9)
                         .plusHours(11)
-                        .plusMinutes(56)
-                        .plusSeconds(13)
+                        .plusMinutes(59)
+                        .plusSeconds(59)
                 )  // Set TTL for cache entries
                 .disableCachingNullValues()
                 .serializeValuesWith(RedisSerializationContext.SerializationPair
