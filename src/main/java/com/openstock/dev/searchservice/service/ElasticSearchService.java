@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.openstock.dev.searchservice.constants.Constants.DB_CALL;
 import static com.openstock.dev.searchservice.constants.Constants.ELASTIC_INDEX;
 
 @Slf4j
@@ -62,48 +63,9 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "'getAllProducts'", value = "AllProducts", unless = "#result == null")
-    public List<Product> getAllProducts() {
-        log.info("DB CALL");
-        try {
-            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .matchAll(m -> m)
-                    ).size(10000), Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error retrieving all products: {}", e.getMessage(), e);
-            return List.of();
-        }
-    }
-
-    @Cacheable(key = "'getProductsInRange:' + #from + '_' + #size", value = "AllProductsPaginated",
-            unless = "#result == null")
-    public Iterable<Product> getProductsInRange(int from, int size) {
-        log.info("DB CALL");
-        try {
-            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .matchAll(m -> m)
-                            ).from(from) // Starting index
-                            .size(size) // Number of records to fetch
-                    , Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error retrieving all products: {}", e.getMessage(), e);
-            return List.of();
-        }
-    }
-
     @Cacheable(key = "#productId", value = "Product", unless = "#result == null")
     public Product getProductById(String productId) {
-        log.info("DB CALL");
+        log.info(DB_CALL);
         try {
             return elasticsearchClient.get(g -> g
                             .index(ELASTIC_INDEX)
@@ -115,253 +77,311 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#keyword", value = "ProductsByMaster", unless = "#result == null")
-    public List<Product> getProductByMaster(String keyword) {
-        log.info("DB CALL");
+    @Cacheable(key = "'getAllProducts:' + #from + '_' + #size", value = "AllProducts",
+            unless = "#result == null")
+    public List<Product> getAllProducts(int from, int size) {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .match(m -> m
-                                    .field("master")
-                                    .query(keyword)
-                            )
-                    ).size(5000), Product.class);
+                            .index(ELASTIC_INDEX)
+                            .query(q -> q
+                                    .matchAll(m -> m)
+                            ).from(from)
+                            .size(size)
+                    , Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            log.error("Error finding products by master - {}: {}", keyword, e.getMessage(), e);
+            log.error("Error retrieving all products: {}", e.getMessage(), e);
             return List.of();
         }
     }
 
-    @Cacheable(key = "#keyword", value = "ProductsByCountry", unless = "#result == null")
-    public List<Product> getProductsByCountry(String keyword) {
-        log.info("DB CALL");
+    @Cacheable(key = "#master + ':' + #from + '_' + #size", value = "ProductsByMaster",
+            unless = "#result == null")
+    public List<Product> getProductByMaster(String master, int from, int size) {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("country.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
+                            .index(ELASTIC_INDEX)
+                            .query(q -> q
+                                    .match(m -> m
+                                            .field("master")
+                                            .query(master)
+                                    )
+                            ).from(from)
+                            .size(size)
+                    , Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            log.error("Error finding products by country - {}: {}", keyword, e.getMessage(), e);
+            log.error("Error finding products by master - {}: {}", master, e.getMessage(), e);
             return List.of();
         }
     }
 
-    @Cacheable(key = "#keyword", value = "ProductsByType", unless = "#result == null")
-    public List<Product> getProductsByType(String keyword) {
-        log.info("DB CALL");
+    @Cacheable(key = "#country + ':' + #from + '_' + #size", value = "ProductsByCountry",
+            unless = "#result == null")
+    public List<Product> getProductsByCountry(String country, int from, int size) {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .match(t -> t
-                                    .field("type.raw") // Ensure the field is a keyword type
-                                    .query(keyword)
-                            )
-                    ).size(5000), Product.class);
+                            .index(ELASTIC_INDEX)
+                            .query(q -> q
+                                    .term(t -> t
+                                            .field("country.raw")
+                                            .value(country)
+                                    )
+                            ).from(from)
+                            .size(size)
+                    , Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            log.error("Error finding products by type - {}: {}", keyword, e.getMessage(), e);
+            log.error("Error finding products by country - {}: {}", country, e.getMessage(), e);
             return List.of();
         }
     }
 
-    @Cacheable(key = "#keyword", value = "ProductsBySubType", unless = "#result == null")
-    public List<Product> getProductsBySubType(String keyword) {
+    @Cacheable(key = "#type + ':' + #from + '_' + #size", value = "ProductsByType",
+            unless = "#result == null")
+    public List<Product> getProductsByType(String type, int from, int size) {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .match(t -> t
-                                    .field("subType.raw") // Ensure the field is a keyword type
-                                    .query(keyword)
-                            )
-                    ).size(5000), Product.class);
+                            .index(ELASTIC_INDEX)
+                            .query(q -> q
+                                    .match(t -> t
+                                            .field("type.raw")
+                                            .query(type)
+                                    )
+                            ).from(from)
+                            .size(size)
+                    , Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            log.error("Error finding products by subType - {}: {}", keyword, e.getMessage(), e);
+            log.error("Error finding products by type - {}: {}", type, e.getMessage(), e);
             return List.of();
         }
     }
 
-    @Cacheable(key = "#keyword", value = "ProductsByRegion", unless = "#result == null")
-    public List<Product> getProductsByReg(String keyword) {
-        log.info("DB CALL");
+    @Cacheable(key = "#subType + ':' + #from + '_' + #size", value = "ProductsBySubType",
+            unless = "#result == null")
+    public List<Product> getProductsBySubType(String subType, int from, int size) {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("reg.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
+                            .index(ELASTIC_INDEX)
+                            .query(q -> q
+                                    .match(t -> t
+                                            .field("subType.raw")
+                                            .query(subType)
+                                    )
+                            ).from(from)
+                            .size(size)
+                    , Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            log.error("Error finding products by region - {}: {}", keyword, e.getMessage(), e);
+            log.error("Error finding products by subType - {}: {}", subType, e.getMessage(), e);
             return List.of();
         }
     }
 
-    @Cacheable(key = "#keyword", value = "ProductsBySubRegion", unless = "#result == null")
-    public List<Product> getProductsBySub(String keyword) {
-        log.info("DB CALL");
+    @Cacheable(key = "#region + ':' + #from + '_' + #size", value = "ProductsByRegion",
+            unless = "#result == null")
+    public List<Product> getProductsByReg(String region, int from, int size) {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("sub.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
+                            .index(ELASTIC_INDEX)
+                            .query(q -> q
+                                    .term(t -> t
+                                            .field("reg.raw")
+                                            .value(region)
+                                    )
+                            ).from(from)
+                            .size(size)
+                    , Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            log.error("Error finding products by sub-region - {}: {}", keyword, e.getMessage(), e);
+            log.error("Error finding products by region - {}: {}", region, e.getMessage(), e);
             return List.of();
         }
     }
 
-    @Cacheable(key = "#keyword", value = "ProductsByDenomination", unless = "#result == null")
-    public List<Product> getProductsByDeno(String keyword) {
-        log.info("DB CALL");
+    @Cacheable(key = "#subRegion + ':' + #from + '_' + #size", value = "ProductsBySubRegion",
+            unless = "#result == null")
+    public List<Product> getProductsBySub(String subRegion, int from, int size) {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("deno.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
+                            .index(ELASTIC_INDEX)
+                            .query(q -> q
+                                    .term(t -> t
+                                            .field("sub.raw")
+                                            .value(subRegion)
+                                    )
+                            ).from(from)
+                            .size(size)
+                    , Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            log.error("Error finding products by denomination - {}: {}", keyword, e.getMessage(), e);
+            log.error("Error finding products by sub-region - {}: {}", subRegion, e.getMessage(), e);
             return List.of();
         }
     }
 
-    @Cacheable(key = "#keyword", value = "ProductsByProducer", unless = "#result == null")
-    public List<Product> getProductsByProd(String keyword) {
-        log.info("DB CALL");
+    @Cacheable(key = "#denomination + ':' + #from + '_' + #size", value = "ProductsByDenomination",
+            unless = "#result == null")
+    public List<Product> getProductsByDeno(String denomination, int from, int size) {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("prod.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
+                            .index(ELASTIC_INDEX)
+                            .query(q -> q
+                                    .term(t -> t
+                                            .field("deno.raw")
+                                            .value(denomination)
+                                    )
+                            ).from(from)
+                            .size(size)
+                    , Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            ElasticSearchService.log.error("Error finding products by producer - {}: {}", keyword, e.getMessage(), e);
+            log.error("Error finding products by denomination - {}: {}", denomination, e.getMessage(), e);
             return List.of();
         }
     }
 
-    @Cacheable(key = "#keyword", value = "ProductsByVariety", unless = "#result == null")
-    public List<Product> getProductsByName(String keyword) {
-        log.info("DB CALL");
+    @Cacheable(key = "#producer + ':' + #from + '_' + #size", value = "ProductsByProducer",
+            unless = "#result == null")
+    public List<Product> getProductsByProd(String producer, int from, int size) {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("name.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
+                            .index(ELASTIC_INDEX)
+                            .query(q -> q
+                                    .term(t -> t
+                                            .field("prod.raw")
+                                            .value(producer)
+                                    )
+                            ).from(from)
+                            .size(size)
+                    , Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            log.error("Error finding products by name - {}: {}", keyword, e.getMessage(), e);
+            log.error("Error finding products by producer - {}: {}", producer, e.getMessage(), e);
             return List.of();
         }
     }
 
-    @Cacheable(key = "#keyword", value = "ProductsByVariety", unless = "#result == null")
-    public List<Product> getProductsByVariety(String keyword) {
-        log.info("DB CALL");
+    @Cacheable(key = "#name + ':' + #from + '_' + #size", value = "ProductsByName",
+            unless = "#result == null")
+    public List<Product> getProductsByName(String name, int from, int size) {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("variety.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
+                            .index(ELASTIC_INDEX)
+                            .query(q -> q
+                                    .term(t -> t
+                                            .field("name.raw")
+                                            .value(name)
+                                    )
+                            ).from(from)
+                            .size(size)
+                    , Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            log.error("Error finding products by variety - {}: {}", keyword, e.getMessage(), e);
+            log.error("Error finding products by name - {}: {}", name, e.getMessage(), e);
             return List.of();
         }
     }
 
-    @Cacheable(key = "#keyword", value = "ProductsByAlcohol", unless = "#result == null")
-    public List<Product> getProductsByAlc(String keyword) {
-        log.info("DB CALL");
+    @Cacheable(key = "#variety + ':' + #from + '_' + #size", value = "ProductsByVariety",
+            unless = "#result == null")
+    public List<Product> getProductsByVariety(String variety, int from, int size) {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(m -> m
-                                    .field("alc.raw")
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
+                            .index(ELASTIC_INDEX)
+                            .query(q -> q
+                                    .term(t -> t
+                                            .field("variety.raw")
+                                            .value(variety)
+                                    )
+                            ).from(from)
+                            .size(size)
+                    , Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            log.error("Error finding products by alcohol percentage - {}: {}", keyword, e.getMessage(), e);
+            log.error("Error finding products by variety - {}: {}", variety, e.getMessage(), e);
             return List.of();
         }
     }
 
-    @Cacheable(key = "#keyword", value = "ProductsByVintage", unless = "#result == null")
-    public List<Product> getProductsByVintage(String keyword) {
+    @Cacheable(key = "#alcoholPercentage + ':' + #from + '_' + #size", value = "ProductsByAlcoholPercentage",
+            unless = "#result == null")
+    public List<Product> getProductsByAlc(String alcoholPercentage, int from, int size) {
         log.info("DB CALL");
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("vintage.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
+                            .index(ELASTIC_INDEX)
+                            .query(q -> q
+                                    .term(t -> t
+                                            .field("alc.raw")
+                                            .value(alcoholPercentage)
+                                    )
+                            ).from(from)
+                            .size(size)
+                    , Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            log.error("Error finding products by vintage - {}: {}", keyword, e.getMessage(), e);
+            log.error("Error finding products by alcohol percentage - {}: {}", alcoholPercentage, e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    @Cacheable(key = "#vintage + ':' + #from + '_' + #size", value = "ProductsByVintage",
+            unless = "#result == null")
+    public List<Product> getProductsByVintage(String vintage, int from, int size) {
+        log.info("DB CALL");
+        try {
+            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+                            .index(ELASTIC_INDEX)
+                            .query(q -> q
+                                    .term(t -> t
+                                            .field("vintage.raw")
+                                            .value(vintage)
+                                    )
+                            ).from(from)
+                            .size(size)
+                    , Product.class);
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error finding products by vintage - {}: {}", vintage, e.getMessage(), e);
             return List.of();
         }
     }

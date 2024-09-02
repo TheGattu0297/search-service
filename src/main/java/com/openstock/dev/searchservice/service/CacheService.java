@@ -10,6 +10,6 @@ public class CacheService {
 
     @CacheEvict(value = "*", allEntries = true)
     public void removeAllCachedData() {
-      log.info("Removing all cached data");
+      log.info("Removing all cached data!");
     }
 }

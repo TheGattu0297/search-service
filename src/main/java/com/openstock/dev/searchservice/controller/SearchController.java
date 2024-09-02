@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -31,15 +32,14 @@ public class SearchController {
     }
 
     @GetMapping("/getAll")
-    public Iterable<Product> getAllProducts (){
-        return elasticSearchService.getAllProducts();
-    }
+    public Iterable<Product> getAllProducts (
+            @RequestParam Optional<Integer> page,
+            @RequestParam Optional<Integer> size){
 
-    @GetMapping("/getAllInRange")
-    public Iterable<Product> getAllProductsInRange (@RequestParam(defaultValue = "0") int page,
-                                                    @RequestParam(defaultValue = "500") int size){
-        int from = page * size; // Calculate starting index based on page and size
-        return elasticSearchService.getProductsInRange(from, size);
+        int pageNumber = page.orElse(0);
+        int pageSize = size.orElse(5000);
+        int from  = pageNumber * pageSize;
+        return elasticSearchService.getAllProducts(from, pageSize);
     }
 
     @GetMapping("/getById/{productId}")
@@ -48,64 +48,135 @@ public class SearchController {
     }
 
     @GetMapping("/master/{master}")
-    public List<Product> getProductByMaster (@PathVariable String master){
-        return elasticSearchService.getProductByMaster(master);
+    public List<Product> getProductByMaster (@PathVariable("master") String master,
+                                             @RequestParam Optional<Integer> page,
+                                             @RequestParam Optional<Integer> size){
+        int pageNumber = page.orElse(0);
+        int pageSize = size.orElse(5000);
+        int from  = pageNumber * pageSize;
+        return elasticSearchService.getProductByMaster(master, from, pageSize);
     }
 
     @GetMapping("/country/{country}")
-    public List<Product> getProductByCountry(@PathVariable("country") String country) {
-        return elasticSearchService.getProductsByCountry(country);
+    public List<Product> getProductByCountry(@PathVariable("country") String country,
+                                             @RequestParam Optional<Integer> page,
+                                             @RequestParam Optional<Integer> size){
+
+        int pageNumber = page.orElse(0);
+        int pageSize = size.orElse(5000);
+        int from  = pageNumber * pageSize;
+        return elasticSearchService.getProductsByCountry(country, from, pageSize);
     }
 
     @GetMapping("/type/{type}")
-    public List<Product> getProductsByType(@PathVariable("type") String type) {
-        return elasticSearchService.getProductsByType(type);
+    public List<Product> getProductsByType(@PathVariable("type") String type,
+                                           @RequestParam Optional<Integer> page,
+                                           @RequestParam Optional<Integer> size){
+
+        int pageNumber = page.orElse(0);
+        int pageSize = size.orElse(5000);
+        int from  = pageNumber * pageSize;
+        return elasticSearchService.getProductsByType(type, from, pageSize);
     }
 
     @GetMapping("/subType/{subType}")
-    public List<Product> getProductsBySubType(@PathVariable("subType") String subType) {
-        return elasticSearchService.getProductsBySubType(subType);
+    public List<Product> getProductsBySubType(@PathVariable("subType") String subType,
+                                              @RequestParam Optional<Integer> page,
+                                              @RequestParam Optional<Integer> size){
+
+        int pageNumber = page.orElse(0);
+        int pageSize = size.orElse(5000);
+        int from  = pageNumber * pageSize;
+        return elasticSearchService.getProductsBySubType(subType, from, pageSize);
     }
 
     @GetMapping("/reg/{region}")
-    public List<Product> getProductsByRegion(@PathVariable("region") String region) {
-        return elasticSearchService.getProductsByReg(region);
+    public List<Product> getProductsByRegion(@PathVariable("region") String region,
+                                             @RequestParam Optional<Integer> page,
+                                             @RequestParam Optional<Integer> size){
+
+        int pageNumber = page.orElse(0);
+        int pageSize = size.orElse(5000);
+        int from  = pageNumber * pageSize;
+        return elasticSearchService.getProductsByReg(region, from, pageSize);
     }
 
     @GetMapping("/sub/{subRegion}")
-    public List<Product> getProductsBySubRegion(@PathVariable("subRegion") String subRegion) {
-        return elasticSearchService.getProductsBySub(subRegion);
+    public List<Product> getProductsBySubRegion(@PathVariable("subRegion") String subRegion,
+                                                @RequestParam Optional<Integer> page,
+                                                @RequestParam Optional<Integer> size){
+
+        int pageNumber = page.orElse(0);
+        int pageSize = size.orElse(5000);
+        int from  = pageNumber * pageSize;
+        return elasticSearchService.getProductsBySub(subRegion, from, pageSize);
     }
 
     @GetMapping("/deno/{denomination}")
-    public List<Product> getProductsByDenomination(@PathVariable("denomination") String denomination) {
-        return elasticSearchService.getProductsByDeno(denomination);
+    public List<Product> getProductsByDenomination(@PathVariable("denomination") String denomination,
+                                                   @RequestParam Optional<Integer> page,
+                                                   @RequestParam Optional<Integer> size){
+
+        int pageNumber = page.orElse(0);
+        int pageSize = size.orElse(5000);
+        int from  = pageNumber * pageSize;
+        return elasticSearchService.getProductsByDeno(denomination, from, pageSize);
     }
 
     @GetMapping("/prod/{producer}")
-    public List<Product> getProductsByProducer(@PathVariable("producer") String producer) {
-        return elasticSearchService.getProductsByProd(producer);
+    public List<Product> getProductsByProducer(@PathVariable("producer") String producer,
+                                               @RequestParam Optional<Integer> page,
+                                               @RequestParam Optional<Integer> size){
+
+        int pageNumber = page.orElse(0);
+        int pageSize = size.orElse(5000);
+        int from  = pageNumber * pageSize;
+        return elasticSearchService.getProductsByProd(producer, from, pageSize);
     }
 
     @GetMapping("/name/{name}")
-    public List<Product> getProductsByName(@PathVariable("name") String name) {
-        return elasticSearchService.getProductsByName(name);
+    public List<Product> getProductsByName(@PathVariable("name") String name,
+                                           @RequestParam Optional<Integer> page,
+                                           @RequestParam Optional<Integer> size){
+
+        int pageNumber = page.orElse(0);
+        int pageSize = size.orElse(5000);
+        int from  = pageNumber * pageSize;
+        return elasticSearchService.getProductsByName(name, from, pageSize);
     }
 
     @GetMapping("/variety/{variety}")
-    public List<Product> getProductsByVariety(@PathVariable("variety") String variety) {
-        return elasticSearchService.getProductsByVariety(variety);
+    public List<Product> getProductsByVariety(@PathVariable("variety") String variety,
+                                              @RequestParam Optional<Integer> page,
+                                              @RequestParam Optional<Integer> size){
+
+        int pageNumber = page.orElse(0);
+        int pageSize = size.orElse(5000);
+        int from  = pageNumber * pageSize;
+        return elasticSearchService.getProductsByVariety(variety, from, pageSize);
     }
 
     @GetMapping("/alc/{alcoholPercentage}")
-    public List<Product> getProductsByAlcoholPercentage(@PathVariable("alcoholPercentage") String alcoholPercentage) {
+    public List<Product> getProductsByAlcoholPercentage(@PathVariable("alcoholPercentage") String alcoholPercentage,
+                                                        @RequestParam Optional<Integer> page,
+                                                        @RequestParam Optional<Integer> size){
+
+        int pageNumber = page.orElse(0);
+        int pageSize = size.orElse(5000);
+        int from  = pageNumber * pageSize;
         String alc = alcoholPercentage + "%";
-        return elasticSearchService.getProductsByAlc(alc);
+        return elasticSearchService.getProductsByAlc(alc, from, pageSize);
     }
 
     @GetMapping("/vintage/{vintage}")
-    public List<Product> getProductsByVintage(@PathVariable("vintage") String vintage) {
-        return elasticSearchService.getProductsByVintage(vintage);
+    public List<Product> getProductsByVintage(@PathVariable("vintage") String vintage,
+                                              @RequestParam Optional<Integer> page,
+                                              @RequestParam Optional<Integer> size){
+
+        int pageNumber = page.orElse(0);
+        int pageSize = size.orElse(5000);
+        int from  = pageNumber * pageSize;
+        return elasticSearchService.getProductsByVintage(vintage, from, pageSize);
     }
 
     @DeleteMapping("/deleteAll")
