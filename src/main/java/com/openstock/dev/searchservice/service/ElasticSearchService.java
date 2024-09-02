@@ -64,6 +64,7 @@ public class ElasticSearchService {
 
     @Cacheable(key = "'getAllProducts'", value = "AllProducts", unless = "#result == null")
     public List<Product> getAllProducts() {
+        log.info("DB CALL");
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -82,6 +83,7 @@ public class ElasticSearchService {
     @Cacheable(key = "'getProductsInRange:' + #from + '_' + #size", value = "AllProductsPaginated",
             unless = "#result == null")
     public Iterable<Product> getProductsInRange(int from, int size) {
+        log.info("DB CALL");
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                             .index(ELASTIC_INDEX)
@@ -136,6 +138,7 @@ public class ElasticSearchService {
 
     @Cacheable(key = "#keyword", value = "ProductsByCountry", unless = "#result == null")
     public List<Product> getProductsByCountry(String keyword) {
+        log.info("DB CALL");
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -156,6 +159,7 @@ public class ElasticSearchService {
 
     @Cacheable(key = "#keyword", value = "ProductsByType", unless = "#result == null")
     public List<Product> getProductsByType(String keyword) {
+        log.info("DB CALL");
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -196,6 +200,7 @@ public class ElasticSearchService {
 
     @Cacheable(key = "#keyword", value = "ProductsByRegion", unless = "#result == null")
     public List<Product> getProductsByReg(String keyword) {
+        log.info("DB CALL");
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -216,6 +221,7 @@ public class ElasticSearchService {
 
     @Cacheable(key = "#keyword", value = "ProductsBySubRegion", unless = "#result == null")
     public List<Product> getProductsBySub(String keyword) {
+        log.info("DB CALL");
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -236,6 +242,7 @@ public class ElasticSearchService {
 
     @Cacheable(key = "#keyword", value = "ProductsByDenomination", unless = "#result == null")
     public List<Product> getProductsByDeno(String keyword) {
+        log.info("DB CALL");
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -256,6 +263,7 @@ public class ElasticSearchService {
 
     @Cacheable(key = "#keyword", value = "ProductsByProducer", unless = "#result == null")
     public List<Product> getProductsByProd(String keyword) {
+        log.info("DB CALL");
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -276,6 +284,7 @@ public class ElasticSearchService {
 
     @Cacheable(key = "#keyword", value = "ProductsByVariety", unless = "#result == null")
     public List<Product> getProductsByName(String keyword) {
+        log.info("DB CALL");
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -296,6 +305,7 @@ public class ElasticSearchService {
 
     @Cacheable(key = "#keyword", value = "ProductsByVariety", unless = "#result == null")
     public List<Product> getProductsByVariety(String keyword) {
+        log.info("DB CALL");
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -316,6 +326,7 @@ public class ElasticSearchService {
 
     @Cacheable(key = "#keyword", value = "ProductsByAlcohol", unless = "#result == null")
     public List<Product> getProductsByAlc(String keyword) {
+        log.info("DB CALL");
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
@@ -336,6 +347,7 @@ public class ElasticSearchService {
 
     @Cacheable(key = "#keyword", value = "ProductsByVintage", unless = "#result == null")
     public List<Product> getProductsByVintage(String keyword) {
+        log.info("DB CALL");
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
