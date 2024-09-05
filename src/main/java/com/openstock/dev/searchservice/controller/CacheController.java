@@ -16,6 +16,7 @@ public class CacheController {
 
     private final CacheService cacheService;
 
+    // Controller to clear all cached data
     @DeleteMapping("/invalidate-all")
     public ResponseEntity<Void> invalidateAllCaches() {
         cacheService.removeAllCachedData();
