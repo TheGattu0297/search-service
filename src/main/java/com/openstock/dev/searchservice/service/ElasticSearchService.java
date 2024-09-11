@@ -77,18 +77,14 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "'getAllProducts:' + #from + '_' + #size", value = "AllProducts",
-            unless = "#result == null")
-    public List<Product> getAllProducts(int from, int size) {
+    @Cacheable(key = "'getAllProducts'", value = "AllProducts", unless = "#result == null")
+    public List<Product> getAllProducts() {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .matchAll(m -> m)
-                            ).from(from)
-                            .size(size)
-                    , Product.class);
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q.matchAll(m -> m))
+                    .size(10000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -98,21 +94,14 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#master + ':' + #from + '_' + #size", value = "ProductsByMaster",
-            unless = "#result == null")
-    public List<Product> getProductByMaster(String master, int from, int size) {
+    @Cacheable(key = "#master", value = "ProductsByMaster", unless = "#result == null")
+    public List<Product> getProductByMaster(String master) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .match(m -> m
-                                            .field("master")
-                                            .query(master)
-                                    )
-                            ).from(from)
-                            .size(size)
-                    , Product.class);
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q.match(m -> m.field("master").query(master)))
+                    .size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -122,21 +111,14 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#country + ':' + #from + '_' + #size", value = "ProductsByCountry",
-            unless = "#result == null")
-    public List<Product> getProductsByCountry(String country, int from, int size) {
+    @Cacheable(key = "#country", value = "ProductsByCountry", unless = "#result == null")
+    public List<Product> getProductsByCountry(String country) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .term(t -> t
-                                            .field("country.raw")
-                                            .value(country)
-                                    )
-                            ).from(from)
-                            .size(size)
-                    , Product.class);
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q.term(t -> t.field("country.raw").value(country)))
+                    .size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -146,21 +128,14 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#type + ':' + #from + '_' + #size", value = "ProductsByType",
-            unless = "#result == null")
-    public List<Product> getProductsByType(String type, int from, int size) {
+    @Cacheable(key = "#type", value = "ProductsByType", unless = "#result == null")
+    public List<Product> getProductsByType(String type) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .match(t -> t
-                                            .field("type.raw")
-                                            .query(type)
-                                    )
-                            ).from(from)
-                            .size(size)
-                    , Product.class);
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q.match(t -> t.field("type.raw").query(type)))
+                    .size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -170,21 +145,14 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#subType + ':' + #from + '_' + #size", value = "ProductsBySubType",
-            unless = "#result == null")
-    public List<Product> getProductsBySubType(String subType, int from, int size) {
+    @Cacheable(key = "#subType", value = "ProductsBySubType", unless = "#result == null")
+    public List<Product> getProductsBySubType(String subType) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .match(t -> t
-                                            .field("subType.raw")
-                                            .query(subType)
-                                    )
-                            ).from(from)
-                            .size(size)
-                    , Product.class);
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q.match(t -> t.field("subType.raw").query(subType)))
+                    .size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -194,21 +162,14 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#region + ':' + #from + '_' + #size", value = "ProductsByRegion",
-            unless = "#result == null")
-    public List<Product> getProductsByReg(String region, int from, int size) {
+    @Cacheable(key = "#region", value = "ProductsByRegion", unless = "#result == null")
+    public List<Product> getProductsByReg(String region) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .term(t -> t
-                                            .field("reg.raw")
-                                            .value(region)
-                                    )
-                            ).from(from)
-                            .size(size)
-                    , Product.class);
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q.term(t -> t.field("reg.raw").value(region)))
+                    .size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -218,21 +179,14 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#subRegion + ':' + #from + '_' + #size", value = "ProductsBySubRegion",
-            unless = "#result == null")
-    public List<Product> getProductsBySub(String subRegion, int from, int size) {
+    @Cacheable(key = "#subRegion", value = "ProductsBySubRegion", unless = "#result == null")
+    public List<Product> getProductsBySub(String subRegion) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .term(t -> t
-                                            .field("sub.raw")
-                                            .value(subRegion)
-                                    )
-                            ).from(from)
-                            .size(size)
-                    , Product.class);
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q.term(t -> t.field("sub.raw").value(subRegion)))
+                    .size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -242,21 +196,14 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#denomination + ':' + #from + '_' + #size", value = "ProductsByDenomination",
-            unless = "#result == null")
-    public List<Product> getProductsByDeno(String denomination, int from, int size) {
+    @Cacheable(key = "#denomination", value = "ProductsByDenomination", unless = "#result == null")
+    public List<Product> getProductsByDeno(String denomination) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .term(t -> t
-                                            .field("deno.raw")
-                                            .value(denomination)
-                                    )
-                            ).from(from)
-                            .size(size)
-                    , Product.class);
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q.term(t -> t.field("deno.raw").value(denomination)))
+                    .size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -266,21 +213,14 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#producer + ':' + #from + '_' + #size", value = "ProductsByProducer",
-            unless = "#result == null")
-    public List<Product> getProductsByProd(String producer, int from, int size) {
+    @Cacheable(key = "#producer", value = "ProductsByProducer", unless = "#result == null")
+    public List<Product> getProductsByProd(String producer) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .term(t -> t
-                                            .field("prod.raw")
-                                            .value(producer)
-                                    )
-                            ).from(from)
-                            .size(size)
-                    , Product.class);
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q.term(t -> t.field("prod.raw").value(producer)))
+                    .size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -290,21 +230,14 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#name + ':' + #from + '_' + #size", value = "ProductsByName",
-            unless = "#result == null")
-    public List<Product> getProductsByName(String name, int from, int size) {
+    @Cacheable(key = "#name", value = "ProductsByName", unless = "#result == null")
+    public List<Product> getProductsByName(String name) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .term(t -> t
-                                            .field("name.raw")
-                                            .value(name)
-                                    )
-                            ).from(from)
-                            .size(size)
-                    , Product.class);
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q.term(t -> t.field("name.raw").value(name)))
+                    .size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -314,21 +247,14 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#variety + ':' + #from + '_' + #size", value = "ProductsByVariety",
-            unless = "#result == null")
-    public List<Product> getProductsByVariety(String variety, int from, int size) {
+    @Cacheable(key = "#variety", value = "ProductsByVariety", unless = "#result == null")
+    public List<Product> getProductsByVariety(String variety) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .term(t -> t
-                                            .field("variety.raw")
-                                            .value(variety)
-                                    )
-                            ).from(from)
-                            .size(size)
-                    , Product.class);
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q.term(t -> t.field("variety.raw").value(variety)))
+                    .size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -338,21 +264,14 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#alcoholPercentage + ':' + #from + '_' + #size", value = "ProductsByAlcoholPercentage",
-            unless = "#result == null")
-    public List<Product> getProductsByAlc(String alcoholPercentage, int from, int size) {
-        log.info("DB CALL");
+    @Cacheable(key = "#alcoholPercentage", value = "ProductsByAlcoholPercentage", unless = "#result == null")
+    public List<Product> getProductsByAlc(String alcoholPercentage) {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .term(t -> t
-                                            .field("alc.raw")
-                                            .value(alcoholPercentage)
-                                    )
-                            ).from(from)
-                            .size(size)
-                    , Product.class);
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q.term(t -> t.field("alc.raw").value(alcoholPercentage)))
+                    .size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -362,21 +281,14 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#vintage + ':' + #from + '_' + #size", value = "ProductsByVintage",
-            unless = "#result == null")
-    public List<Product> getProductsByVintage(String vintage, int from, int size) {
-        log.info("DB CALL");
+    @Cacheable(key = "#vintage", value = "ProductsByVintage", unless = "#result == null")
+    public List<Product> getProductsByVintage(String vintage) {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .term(t -> t
-                                            .field("vintage.raw")
-                                            .value(vintage)
-                                    )
-                            ).from(from)
-                            .size(size)
-                    , Product.class);
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q.term(t -> t.field("vintage.raw").value(vintage)))
+                    .size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -385,6 +297,7 @@ public class ElasticSearchService {
             return List.of();
         }
     }
+
 
     public void deleteAll() {
         try {
@@ -398,114 +311,6 @@ public class ElasticSearchService {
             log.error("Error deleting all products: {}", e.getMessage(), e);
         }
     }
-
-//    public List<Product> fetchSuggestions(String searchKeyword) {
-//        try {
-//            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-//                            .index(ELASTIC_INDEX)
-//                            .query(q -> q
-//                                    .bool(b -> b
-//                                            .should(sh -> sh
-//                                                    .term(t -> t
-//                                                            .field("productID")
-//                                                            .value(searchKeyword)
-//                                                    )
-//                                            ).should(sh -> sh
-//                                                    .term(m -> m
-//                                                            .field("master")
-//                                                            .value(searchKeyword)
-//                                                    )
-//                                            )
-//                                            .should(sh -> sh
-//                                                    .match(m -> m
-//                                                            .field("country")
-//                                                            .query(searchKeyword)
-//                                                            .fuzziness("AUTO")
-//                                                    )
-//                                            )
-//                                            .should(sh -> sh
-//                                                    .match(m -> m
-//                                                            .field("type")
-//                                                            .query(searchKeyword)
-//                                                            .fuzziness("AUTO")
-//                                                    )
-//                                            )
-//                                            .should(sh -> sh
-//                                                    .match(m -> m
-//                                                            .field("subType")
-//                                                            .query(searchKeyword)
-//                                                            .fuzziness("AUTO")
-//                                                    )
-//                                            )
-//                                            .should(sh -> sh
-//                                                    .match(m -> m
-//                                                            .field("reg")
-//                                                            .query(searchKeyword)
-//                                                            .fuzziness("AUTO")
-//                                                    )
-//                                            )
-//                                            .should(sh -> sh
-//                                                    .match(m -> m
-//                                                            .field("sub")
-//                                                            .query(searchKeyword)
-//                                                            .fuzziness("AUTO")
-//                                                    )
-//                                            )
-//                                            .should(sh -> sh
-//                                                    .match(m -> m
-//                                                            .field("deno")
-//                                                            .query(searchKeyword)
-//                                                            .fuzziness("AUTO")
-//                                                    )
-//                                            )
-//                                            .should(sh -> sh
-//                                                    .match(m -> m
-//                                                            .field("prod")
-//                                                            .query(searchKeyword)
-//                                                            .fuzziness("AUTO")
-//                                                    )
-//                                            )
-//                                            .should(sh -> sh
-//                                                    .match(m -> m
-//                                                            .field("name")
-//                                                            .query(searchKeyword)
-//                                                            .fuzziness("AUTO")
-//                                                    )
-//                                            )
-//                                            .should(sh -> sh
-//                                                    .match(m -> m
-//                                                            .field("variety")
-//                                                            .query(searchKeyword)
-//                                                            .fuzziness("AUTO")
-//                                                    )
-//                                            )
-//                                            .should(sh -> sh
-//                                                    .match(m -> m
-//                                                            .field("alc")
-//                                                            .query(searchKeyword)
-//                                                            .fuzziness("AUTO")
-//                                                    )
-//                                            )
-//                                            .should(sh -> sh
-//                                                    .match(m -> m
-//                                                            .field("vintage")
-//                                                            .query(searchKeyword)
-//                                                            .fuzziness("AUTO")
-//                                                    )
-//                                            )
-//                                    )
-//                            )
-//                            .size(100) // Limiting to top 100 results
-//                    , Product.class);
-//
-//            return response.hits().hits().stream()
-//                    .map(Hit::source)
-//                    .toList();
-//        } catch (Exception e) {
-//            // Handle exceptions or log error
-//            return List.of(); // Return an empty list or handle accordingly
-//        }
-//    }
 
     public List<Product> fetchSuggestions(String searchKeyword) {
         try {
