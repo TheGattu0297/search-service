@@ -2,33 +2,18 @@ package com.openstock.dev.searchservice.controller;
 
 import com.openstock.dev.searchservice.entity.Product;
 import com.openstock.dev.searchservice.service.ElasticSearchService;
-import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @CrossOrigin
 @RestController
 @RequestMapping(value = "/search")
 public class SearchController {
 
     private final ElasticSearchService elasticSearchService;
-
-    public SearchController(ElasticSearchService elasticSearchService) {
-        this.elasticSearchService = elasticSearchService;
-    }
-
-    @PostMapping("/save")
-    public ResponseEntity<String> addProduct (@RequestBody Product product){
-        elasticSearchService.saveProduct(product);
-        return ResponseEntity.ok("Product inserted successfully!");
-    }
-
-    @PostMapping("/saveAll")
-    public ResponseEntity<String> addProducts (@RequestBody List<Product> products){
-        elasticSearchService.saveProducts(products);
-        return ResponseEntity.ok("Products inserted successfully!");
-    }
 
     @GetMapping("/getAll")
     public Iterable<Product> getAllProducts() {
@@ -99,13 +84,6 @@ public class SearchController {
     @GetMapping("/vintage/{vintage}")
     public List<Product> getProductsByVintage(@PathVariable("vintage") String vintage) {
         return elasticSearchService.getProductsByVintage(vintage);
-    }
-
-
-    @DeleteMapping("/deleteAll")
-    public String deleteProducts() {
-        elasticSearchService.deleteAll();
-        return "All Products in Elastic deleted !!";
     }
 
     @GetMapping("/{keyword}")

@@ -1,8 +1,6 @@
 package com.openstock.dev.searchservice.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.BulkRequest;
-import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.openstock.dev.searchservice.entity.Product;
@@ -22,46 +20,6 @@ import static com.openstock.dev.searchservice.constants.Constants.ELASTIC_INDEX;
 public class ElasticSearchService {
 
     private final ElasticsearchClient elasticsearchClient;
-
-
-    /**
-     * Persist the individual Product entity in the Elasticsearch cluster
-     */
-    public void saveProduct(Product product) {
-        try {
-            elasticsearchClient.index(i -> i
-                    .index(ELASTIC_INDEX)
-                    .id(product.getProductID())  // Set the ID here
-                    .document(product)
-            );
-        } catch (Exception e) {
-            log.error("Error saving product: {}", e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Bulk-save the Products in the Elasticsearch cluster
-     */
-    public void saveProducts(List<Product> productList) {
-        try {
-            BulkRequest.Builder bulkRequest = new BulkRequest.Builder();
-            for (Product product : productList) {
-                bulkRequest.operations(op -> op
-                        .index(idx -> idx
-                                .index(ELASTIC_INDEX)
-                                .id(product.getProductID())  // Set the ID here
-                                .document(product)
-                        )
-                );
-            }
-            BulkResponse bulkResponse = elasticsearchClient.bulk(bulkRequest.build());
-            if (bulkResponse.errors()) {
-                log.error("Errors occurred during bulk save: {}", bulkResponse.items().size());
-            }
-        } catch (Exception e) {
-            log.error("Error saving products: {}", e.getMessage(), e);
-        }
-    }
 
     @Cacheable(key = "#productId", value = "Product", unless = "#result == null")
     public Product getProductById(String productId) {
@@ -295,20 +253,6 @@ public class ElasticSearchService {
         } catch (Exception e) {
             log.error("Error finding products by vintage - {}: {}", vintage, e.getMessage(), e);
             return List.of();
-        }
-    }
-
-
-    public void deleteAll() {
-        try {
-            elasticsearchClient.deleteByQuery(d -> d
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .matchAll(m -> m)
-                    )
-            );
-        } catch (Exception e) {
-            log.error("Error deleting all products: {}", e.getMessage(), e);
         }
     }
 
