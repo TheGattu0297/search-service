@@ -24,6 +24,7 @@ import static com.openstock.dev.searchservice.constants.Constants.ELASTIC_INDEX;
 public class DataService {
 
     private final ElasticsearchClient elasticsearchClient;
+    private final CacheService cacheService;
     private final DataRepository dataRepository;
 
     /**
@@ -91,48 +92,61 @@ public class DataService {
         List<Product> products = getProductsByIds(productIdList);  // Assume findProductsByIds is defined
 
         if (products.isEmpty()) {
-            log.warn("No products found for provided product IDs: {}", productIds);
+            log.error("No products found for provided product IDs: {}", productIds);
             return;
         }
 
-        // Update the relevant field in each product
+        // Update the relevant field in each product and evict cache for the specific product and attribute
         products.forEach(product -> {
+            cacheService.evictProductCache(product.getProductID());
+            // Update the relevant product fields based on the helperType
             switch (helperType) {
                 case COUNTRY:
                     product.setCountry(updatedValue);
                     if (updatedFlag != null) {
-                        product.setCountryFlag(updatedFlag); // Country-specific flag update
+                        product.setCountryFlag(updatedFlag);
                     }
+                    cacheService.evictCountryCache(product.getCountry());
                     break;
                 case TYPE:
                     product.setType(updatedValue);
+                    cacheService.evictTypeCache(product.getType());
                     break;
                 case SUB_TYPE:
                     product.setSubType(updatedValue);
+                    cacheService.evictSubTypeCache(product.getSubType());
                     break;
                 case REGION:
                     product.setReg(updatedValue);
+                    cacheService.evictRegionCache(product.getReg());
                     break;
                 case SUB_REGION:
                     product.setSub(updatedValue);
+                    cacheService.evictSubRegionCache(product.getSub());
                     break;
                 case DENOMINATION:
                     product.setDeno(updatedValue);
+                    cacheService.evictDenominationCache(product.getDeno());
                     break;
                 case PRODUCER:
                     product.setProd(updatedValue);
+                    cacheService.evictProducerCache(product.getProd());
                     break;
                 case NAME:
                     product.setName(updatedValue);
+                    cacheService.evictNameCache(product.getName());
                     break;
                 case VARIETY:
                     product.setVariety(updatedValue);
+                    cacheService.evictVarietyCache(product.getVariety());
                     break;
                 case ALCOHOL:
                     product.setAlc(updatedValue);
+                    cacheService.evictAlcoholCache(product.getAlc());
                     break;
                 case VINTAGE:
                     product.setVintage(updatedValue);
+                    cacheService.evictVintageCache(product.getVintage());
                     break;
                 case INFO:
                     product.setInfo(updatedValue);
