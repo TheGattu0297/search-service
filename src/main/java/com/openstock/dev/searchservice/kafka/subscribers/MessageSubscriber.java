@@ -11,6 +11,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.openstock.dev.searchservice.constants.Constants.*;
 
@@ -60,27 +61,61 @@ public class MessageSubscriber {
         log.info("Received helper update message: {}", payload);
 
         try {
-            // Extract helperType, productIds, updatedValue, and optionally updatedFlag
-            HelperType helperType = HelperType.fromFieldName(payload.get("helperType").toString());
-            Set<String> productIds = new HashSet<>((List<String>) payload.get("productIds"));
-            String updatedValue = (String) payload.get(helperType.getFieldName());
-            String updatedFlag = (String) payload.get("countryFlag"); // Only applicable for country
-
-            if (productIds.isEmpty() || updatedValue == null) {
-                log.warn("Invalid message: missing product IDs or updated value");
-                return;
+            // Retrieve helperType from the payload
+            String helperTypeString = (String) payload.get("helperType");
+            if (helperTypeString == null) {
+                log.error("Missing 'helperType' in the payload.");
+                return; // Early exit if helperType is missing
             }
 
-            // Delegate the update logic to the product service
+            // Convert helperType string to enum
+            HelperType helperType = HelperType.fromFieldName(helperTypeString);
+
+            // Safely extract product IDs from the payload
+            Object productIdsObj = payload.get("productIds");
+            Set<String> productIds;
+            if (productIdsObj instanceof List<?>) {
+                try {
+                    productIds = ((List<?>) productIdsObj).stream()
+                            .map(Object::toString)  // Safely cast each object to String
+                            .collect(Collectors.toSet());
+                } catch (ClassCastException e) {
+                    log.error("Invalid type in productIds list: {}", e.getMessage());
+                    return; // Early exit if product IDs are invalid
+                }
+            } else {
+                log.error("Invalid or missing 'productIds' field in the payload.");
+                return; // Early exit if product IDs are missing
+            }
+
+            if (productIds.isEmpty()) {
+                log.warn("No Product IDs found in the payload.");
+                return; // Early exit if product IDs are empty
+            }
+
+            // Extract the updated value (e.g., country, type, etc.) based on the helper type
+            String updatedValue = (String) payload.get(helperType.getFieldName());
+            // Validate that updated value is present
+            if (updatedValue == null) {
+                log.warn("No updated value found for helperType: {}", helperType.getDisplayName());
+            }
+
+            // Extract the updated flag (only for Country)
+            String updatedFlag = null;
+            if (helperType == HelperType.COUNTRY) {
+                updatedFlag = (String) payload.get("countryFlag");
+            }
+
+
+
+            // Proceed with updating products using the extracted values
             dataService.updateProducts(helperType, productIds, updatedValue, updatedFlag);
 
-            log.info("Successfully processed update for helperType: {} and updated {} products.",
+            log.info("Successfully processed helper update for helperType: {} with {} products updated.",
                     helperType.getDisplayName(), productIds.size());
 
         } catch (Exception e) {
             log.error("Error processing helper update message: {}", e.getMessage(), e);
         }
     }
-
-
 }

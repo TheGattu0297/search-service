@@ -102,7 +102,9 @@ public class DataService {
             // Update the relevant product fields based on the helperType
             switch (helperType) {
                 case COUNTRY:
-                    product.setCountry(updatedValue);
+                    if (updatedValue != null) {
+                        product.setCountry(updatedValue);
+                    }
                     if (updatedFlag != null) {
                         product.setCountryFlag(updatedFlag);
                     }
