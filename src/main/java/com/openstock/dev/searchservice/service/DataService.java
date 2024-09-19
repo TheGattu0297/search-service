@@ -37,6 +37,7 @@ public class DataService {
                     .id(product.getProductID())  // Set the ID here
                     .document(product)
             );
+            cacheService.evictAllProductCache();
         } catch (Exception e) {
             log.error("Error saving product: {}", e.getMessage(), e);
         }
@@ -61,6 +62,7 @@ public class DataService {
             if (bulkResponse.errors()) {
                 log.error("Errors occurred during bulk save: {}", bulkResponse.items().size());
             }
+            cacheService.evictAllProductCache();
         } catch (Exception e) {
             log.error("Error saving products: {}", e.getMessage(), e);
         }
@@ -77,6 +79,7 @@ public class DataService {
                             .matchAll(m -> m)
                     )
             );
+            cacheService.evictAllProductCache();
         } catch (Exception e) {
             log.error("Error deleting all products: {}", e.getMessage(), e);
         }
@@ -99,6 +102,7 @@ public class DataService {
         // Update the relevant field in each product and evict cache for the specific product and attribute
         products.forEach(product -> {
             cacheService.evictProductCache(product.getProductID());
+            cacheService.evictAllProductCache();
             // Update the relevant product fields based on the helperType
             switch (helperType) {
                 case COUNTRY:

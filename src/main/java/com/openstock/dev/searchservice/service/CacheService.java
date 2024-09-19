@@ -25,7 +25,9 @@ public class CacheService {
         if (productCache != null) {
             productCache.evict(productId); // Evict individual product cache
         }
+    }
 
+    public void evictAllProductCache() {
         Cache allProductsCache = cacheManager.getCache("AllProducts");
         if (allProductsCache != null) {
             allProductsCache.clear(); // Evict the "getAllProducts" cache
