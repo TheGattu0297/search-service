@@ -19,7 +19,7 @@ public class ProductMessageModel {
     private String reg;
     private String sub;
     private String deno;
-    private String prod;
+    private ProducerModel prod;
     private String name;
     private String variety;
     private String alc;

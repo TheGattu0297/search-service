@@ -277,7 +277,7 @@ public class ElasticSearchService {
                                             .should(sh -> sh
                                                     .multiMatch(mm -> mm
                                                             .query(searchKeyword)
-                                                            .fields("prod^5", "deno^5", "vintage^5",
+                                                            .fields("prod.prodValue^5", "deno^5", "vintage^5",
                                                                     "country^3", "name^3", "reg^3", "type^3",
                                                                     "subType", "sub", "variety", "alc")
                                                             .fuzziness("AUTO")

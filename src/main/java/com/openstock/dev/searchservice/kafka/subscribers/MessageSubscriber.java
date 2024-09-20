@@ -3,6 +3,7 @@ package com.openstock.dev.searchservice.kafka.subscribers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openstock.dev.searchservice.constants.HelperType;
 import com.openstock.dev.searchservice.entity.Product;
+import com.openstock.dev.searchservice.entity.fields.Producer;
 import com.openstock.dev.searchservice.kafka.messagemodel.ProductMessageModel;
 import com.openstock.dev.searchservice.service.DataService;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.openstock.dev.searchservice.constants.Constants.*;
@@ -32,24 +36,30 @@ public class MessageSubscriber {
         List<Product> toSave = messageInfoDTOList.stream()
                 .map(map -> mapper.convertValue(map, ProductMessageModel.class)) // Convert LinkedHashMap to ProductMessageModel
                 .filter(Objects::nonNull) // Filter out any null values if conversion failed
-                .map(data -> Product.builder()
-                        .productID(data.getProductID())
-                        .master(data.getMaster())
-                        .country(data.getCountry())
-                        .countryFlag(data.getCountryFlag())
-                        .type(data.getType())
-                        .subType(data.getSubType())
-                        .reg(data.getReg())
-                        .sub(data.getSub())
-                        .deno(data.getDeno())
-                        .prod(data.getProd())
-                        .name(data.getName())
-                        .variety(data.getVariety())
-                        .alc(data.getAlc())
-                        .vintage(data.getVintage())
-                        .info(data.getInfo())
-                        .img(data.getImg())
-                        .build())
+                .map(data -> {
+
+                    Producer producer = (data.getProd() != null) ?
+                            new Producer(data.getProd().getProdId(), data.getProd().getProdValue()) : null;
+
+                    return Product.builder()
+                            .productID(data.getProductID())
+                            .master(data.getMaster())
+                            .country(data.getCountry())
+                            .countryFlag(data.getCountryFlag())
+                            .type(data.getType())
+                            .subType(data.getSubType())
+                            .reg(data.getReg())
+                            .sub(data.getSub())
+                            .deno(data.getDeno())
+                            .prod(producer)
+                            .name(data.getName())
+                            .variety(data.getVariety())
+                            .alc(data.getAlc())
+                            .vintage(data.getVintage())
+                            .info(data.getInfo())
+                            .img(data.getImg())
+                            .build();
+                })
                 .toList(); // Collect to a List of Product entities
 
         dataService.saveProducts(toSave); // Assuming saveProducts can handle a list of products

@@ -94,12 +94,21 @@
         }
       },
       "prod": {
-        "type": "text",
-        "analyzer": "autocomplete",
-        "search_analyzer": "standard",
-        "fields": {
-          "raw": {
-            "type": "keyword"
+        "type": "object",
+        "properties": {
+          "prodId": {
+            "type": "keyword",
+            "index": false
+          },
+          "prodValue": {
+            "type": "text",
+            "analyzer": "autocomplete",
+            "search_analyzer": "standard",
+            "fields": {
+              "raw": {
+                "type": "keyword"
+              }
+            }
           }
         }
       },

@@ -1,6 +1,7 @@
 package com.openstock.dev.searchservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.openstock.dev.searchservice.entity.fields.Producer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,8 +40,8 @@ public class Product implements Serializable {
     private String sub;
     @Field(type = FieldType.Text, name = "deno")
     private String deno;
-    @Field(type = FieldType.Text, name = "prod")
-    private String prod;
+    @Field(type = FieldType.Object, name = "prod")
+    private Producer prod;
     @Field(type = FieldType.Text, name = "name")
     private String name;
     @Field(type = FieldType.Text, name = "variety")

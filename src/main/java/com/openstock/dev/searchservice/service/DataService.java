@@ -5,6 +5,7 @@ import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import com.openstock.dev.searchservice.constants.HelperType;
 import com.openstock.dev.searchservice.entity.Product;
+import com.openstock.dev.searchservice.entity.fields.Producer;
 import com.openstock.dev.searchservice.repository.DataRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -135,8 +136,11 @@ public class DataService {
                     cacheService.evictDenominationCache(product.getDeno());
                     break;
                 case PRODUCER:
-                    product.setProd(updatedValue);
-                    cacheService.evictProducerCache(product.getProd());
+                    if (product.getProd() == null) {
+                        product.setProd(new Producer()); // Initialize if null
+                    }
+                    product.getProd().setProdValue(updatedValue);
+                    cacheService.evictProducerCache(product.getProd().getProdValue());
                     break;
                 case NAME:
                     product.setName(updatedValue);
