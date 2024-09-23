@@ -8,12 +8,14 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
-public class Producer {
+public class Producer implements Serializable {
 
     @Field(type = FieldType.Keyword, name = "prodId", index = false)
     private String prodId;

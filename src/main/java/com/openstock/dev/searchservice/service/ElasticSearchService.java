@@ -177,7 +177,7 @@ public class ElasticSearchService {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
-                    .query(q -> q.term(t -> t.field("prod.raw").value(producer)))
+                    .query(q -> q.term(t -> t.field("prod.prodValue.raw").value(producer)))
                     .size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
