@@ -152,6 +152,14 @@
       "img": {
         "type": "text",
         "index": false
+      },
+      "isBoosted": {
+        "type": "boolean",
+        "index": true
+      },
+      "boostPriority": {
+        "type": "integer",
+        "index": true
       }
     }
   }

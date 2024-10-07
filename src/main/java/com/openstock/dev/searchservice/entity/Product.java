@@ -54,5 +54,9 @@ public class Product implements Serializable {
     private String info;
     @Field(type = FieldType.Text, name = "img", index = false)
     private String img;
+    @Field(type = FieldType.Boolean, name = "isBoosted")
+    private Boolean isBoosted;
+    @Field(type = FieldType.Integer, name = "boostPriority")
+    private Integer boostPriority;
 }
 

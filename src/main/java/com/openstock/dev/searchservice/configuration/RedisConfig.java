@@ -1,5 +1,6 @@
 package com.openstock.dev.searchservice.configuration;
 
+import io.lettuce.core.ClientOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
@@ -7,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
@@ -35,7 +37,18 @@ public class RedisConfig {
         configuration.setPort(uri.getPort());
         configuration.setUsername(username);
         configuration.setPassword(password);
-        return new LettuceConnectionFactory(configuration);
+
+        // Configure timeouts and pool settings via LettuceClientConfiguration
+        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
+                .commandTimeout(Duration.ofSeconds(5))  // Command timeout
+                .shutdownTimeout(Duration.ofMillis(100))  // Shutdown timeout
+                .clientOptions(ClientOptions.builder()
+                        .autoReconnect(true)  // Enable auto-reconnect
+                        .disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)
+                        .build())
+                .build();
+
+        return new LettuceConnectionFactory(configuration, clientConfig);
     }
 
     @Bean
@@ -54,9 +67,9 @@ public class RedisConfig {
     @Bean
     public CacheManager cacheManager() throws URISyntaxException {
         RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofDays(9)
-                        .plusHours(11)
-                        .plusMinutes(59)
+                .entryTtl(Duration.ofDays(7)
+                        .plusHours(1)
+                        .plusMinutes(1)
                         .plusSeconds(59)
                 )  // Set TTL for cache entries
                 .disableCachingNullValues()

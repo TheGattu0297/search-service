@@ -8,6 +8,13 @@ public final class Constants {
 
     public static final String DB_CALL = "DB CALL";
 
+    public static final String NOT_FOUND = " not found.";
+
+    public static final String PRODUCT_WITH_ID = "Product with ID ";
+
+    // Prefix for cache group
+    public static final String PRODUCT_CACHE_PREFIX = "SS:";
+
     // Kafka Topics & Constants
     public static final String KAFKA_GROUP_ID = "OS-Product";
 
@@ -19,5 +26,4 @@ public final class Constants {
 
     private Constants() {
     }
-
 }

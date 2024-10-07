@@ -3,21 +3,25 @@ package com.openstock.dev.searchservice.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
+import com.openstock.dev.searchservice.cache.CacheService;
 import com.openstock.dev.searchservice.constants.HelperType;
+import com.openstock.dev.searchservice.dto.ProductBoostRequestDTO;
 import com.openstock.dev.searchservice.entity.Product;
 import com.openstock.dev.searchservice.entity.fields.Producer;
+import com.openstock.dev.searchservice.exceptions.SearchServiceExceptions;
+import com.openstock.dev.searchservice.exceptions.SearchServiceExceptions.ProductNotFoundException;
 import com.openstock.dev.searchservice.repository.DataRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 
-import static com.openstock.dev.searchservice.constants.Constants.DB_CALL;
-import static com.openstock.dev.searchservice.constants.Constants.ELASTIC_INDEX;
+import static com.openstock.dev.searchservice.constants.Constants.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,6 +31,10 @@ public class DataService {
     private final ElasticsearchClient elasticsearchClient;
     private final CacheService cacheService;
     private final DataRepository dataRepository;
+
+    private final TaskScheduler taskScheduler;
+
+    private final Map<String, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
     /**
      * Persist the individual Product entity in the Elasticsearch cluster
@@ -187,4 +195,135 @@ public class DataService {
         }
     }
 
+    // Method to add boost to a product
+    public void addBoostToProduct(ProductBoostRequestDTO boostRequest) {
+        try {
+            // Fetch the product by ID from Elasticsearch
+            Product product = elasticsearchClient.get(g -> g
+                    .index(ELASTIC_INDEX)
+                    .id(boostRequest.getProductID()), Product.class).source();
+
+            // Null check for product existence
+            if (product == null) {
+                throw new SearchServiceExceptions.ProductNotFoundException(PRODUCT_WITH_ID +
+                        boostRequest.getProductID() + NOT_FOUND);
+            }
+
+            // If the product is already boosted, remove the boost first
+            if (Boolean.TRUE.equals(product.getIsBoosted())) {
+                throw new IllegalStateException("Product is already boosted. Please remove the existing boost first.");
+            }
+
+            // Set boost details and priority (default to 4 if not provided)
+            product.setIsBoosted(Boolean.TRUE);
+            product.setBoostPriority(boostRequest.getBoostPriority() != null ? boostRequest.getBoostPriority() : 3);
+
+            // Save the updated product back to Elasticsearch
+            elasticsearchClient.index(i -> i
+                    .index(ELASTIC_INDEX)
+                    .id(boostRequest.getProductID())
+                    .document(product));
+
+            log.info("Boost added for product {}: isBoosted={}, boostPriority={}",
+                    boostRequest.getProductID(), Boolean.TRUE, boostRequest.getBoostPriority());
+
+            // Schedule boost removal using TTL if provided
+            if (boostRequest.getTtlHours() != null && boostRequest.getTtlHours() > 0) {
+                scheduleBoostRemoval(boostRequest.getProductID(), boostRequest.getTtlHours());
+            } else {
+                // Default TTL if not provided (7 days)
+                scheduleBoostRemoval(boostRequest.getProductID(), 12.0f); // 12 Hours
+            }
+
+            // Evict caches for the product group after boost update
+            cacheService.evictCacheGroupAsync();
+
+        } catch (Exception e) {
+            log.error("Error adding boost for product {}: {}", boostRequest.getProductID(), e.getMessage());
+            throw new SearchServiceExceptions.ProductAlreadyBoostedException(boostRequest.getProductID());
+        }
+    }
+
+    // Method to remove boost from a product
+    public void removeBoostFromProduct(String productId, boolean isScheduled) {
+        try {
+            // Fetch the product by ID from Elasticsearch
+            Product product = elasticsearchClient.get(g -> g
+                    .index(ELASTIC_INDEX)
+                    .id(productId), Product.class).source();
+
+            // Null check for product existence
+            if (product == null) {
+                throw new ProductNotFoundException(PRODUCT_WITH_ID + productId + NOT_FOUND);
+            }
+
+            // If the product is not boosted, throw an exception
+            if (product.getIsBoosted() == null || !product.getIsBoosted()) {
+                throw new IllegalStateException("Product is not boosted, cannot remove boost.");
+            }
+
+            // Reset boost fields to null
+            product.setIsBoosted(null);
+            product.setBoostPriority(null);
+
+            // Save the updated product back to Elasticsearch
+            elasticsearchClient.index(i -> i
+                    .index(ELASTIC_INDEX)
+                    .id(productId)
+                    .document(product));
+
+            log.info("Boost removed for product {}", productId);
+
+            // Remove scheduled task from the map
+            removeScheduledTask(productId);
+
+            // Evict caches if this is not a scheduled task
+            if (!isScheduled) {
+                cacheService.evictCacheGroupAsync();
+            }
+
+        } catch (Exception e) {
+            log.error("Error removing boost for product {}: {}", productId, e.getMessage());
+            throw new SearchServiceExceptions.ProductNotBoostedException(productId);
+        }
+    }
+
+    public void scheduleBoostRemoval(String productId, Float ttlHours) {
+        if (ttlHours == null || ttlHours <= 0) {
+            throw new IllegalArgumentException("TTL must be greater than zero.");
+        }
+
+        // Remove any existing scheduled task
+        removeScheduledTask(productId);
+
+        // Schedule a new task to remove boost after the TTL expires
+        Instant triggerTime = Instant.now().plusSeconds((long) (ttlHours * 3600));
+        ScheduledFuture<?> scheduledTask = taskScheduler.schedule(
+                () -> {
+                    log.info("Scheduled boost removal for product {}.", productId);
+
+                    try {
+                        removeBoostFromProduct(productId, true);  // Pass 'true' as it's a scheduled task
+                    } catch (Exception e) {
+                        log.error("Error removing boost for product {} in scheduled task: {}", productId, e.getMessage());
+                        return;
+                    }
+
+                    // Evict cache after the boost is removed and after the wait period
+                    cacheService.evictCacheGroupAsync();
+                }, triggerTime);
+
+        // Add the scheduled task to the map
+        scheduledTasks.put(productId, scheduledTask);
+    }
+
+    // Cancel any scheduled boost removal job for a product
+    private void removeScheduledTask(String productId) {
+        ScheduledFuture<?> scheduledTask = scheduledTasks.get(productId);
+        if (scheduledTask != null) {
+            scheduledTask.cancel(true);
+            scheduledTasks.remove(productId);
+            log.info("Cancelled scheduled boost removal for product {}", productId);
+        }
+    }
 }

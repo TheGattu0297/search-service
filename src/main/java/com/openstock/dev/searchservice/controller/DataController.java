@@ -1,8 +1,10 @@
 package com.openstock.dev.searchservice.controller;
 
+import com.openstock.dev.searchservice.dto.ProductBoostRequestDTO;
 import com.openstock.dev.searchservice.entity.Product;
 import com.openstock.dev.searchservice.service.DataService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,5 +34,27 @@ public class DataController {
     public ResponseEntity<String> deleteProducts() {
         dataService.deleteAll();
         return ResponseEntity.ok("All Products in Elastic Cluster deleted !!");
+    }
+
+    @PostMapping("/addBoost")
+    public ResponseEntity<String> manageProductBoosting(@RequestBody ProductBoostRequestDTO request) {
+        try {
+            dataService.addBoostToProduct(request);
+            return ResponseEntity.ok("Boosting information updated successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to update boosting information: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/removeBoost")
+    public ResponseEntity<String> removeProductBoosting(@RequestBody ProductBoostRequestDTO request) {
+        try {
+            dataService.removeBoostFromProduct(request.getProductID(), false);
+            return ResponseEntity.ok("Boosting removed successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to remove boosting: " + e.getMessage());
+        }
     }
 }

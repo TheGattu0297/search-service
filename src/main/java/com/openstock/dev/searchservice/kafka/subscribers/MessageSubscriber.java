@@ -58,6 +58,8 @@ public class MessageSubscriber {
                             .vintage(data.getVintage())
                             .info(data.getInfo())
                             .img(data.getImg())
+                            .isBoosted(null)
+                            .boostPriority(null)
                             .build();
                 })
                 .toList(); // Collect to a List of Product entities
