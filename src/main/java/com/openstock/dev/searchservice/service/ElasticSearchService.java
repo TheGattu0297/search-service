@@ -35,7 +35,7 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "'getAllProducts'", value = "AllProducts", unless = "#result == null")
+    @Cacheable(key = "#getAllProducts", value = "AllProducts", unless = "#result == null")
     public List<Product> getAllProducts() {
         log.info(DB_CALL);
         try {
