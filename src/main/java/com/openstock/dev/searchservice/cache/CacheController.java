@@ -1,6 +1,5 @@
-package com.openstock.dev.searchservice.controller;
+package com.openstock.dev.searchservice.cache;
 
-import com.openstock.dev.searchservice.service.CacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,8 +17,8 @@ public class CacheController {
 
     // Controller to clear all cached data
     @DeleteMapping("/invalidate-all")
-    public ResponseEntity<Void> invalidateAllCaches() {
-        cacheService.removeAllCachedData();
-        return ResponseEntity.noContent().build(); // HTTP 204 No Content
+    public ResponseEntity<String> invalidateAllCaches() {
+        cacheService.evictCacheGroupAsync();
+        return ResponseEntity.ok("All Search-Service cache removed!"); // HTTP 204 No Content
     }
 }
