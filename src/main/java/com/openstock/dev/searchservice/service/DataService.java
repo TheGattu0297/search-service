@@ -263,7 +263,7 @@ public class DataService {
             }
 
             // Reset boost fields to null
-            product.setIsBoosted(null);
+            product.setIsBoosted(Boolean.FALSE);
             product.setBoostPriority(null);
 
             // Save the updated product back to Elasticsearch

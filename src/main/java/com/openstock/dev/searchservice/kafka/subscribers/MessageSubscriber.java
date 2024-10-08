@@ -11,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.openstock.dev.searchservice.constants.Constants.*;
@@ -58,7 +55,7 @@ public class MessageSubscriber {
                             .vintage(data.getVintage())
                             .info(data.getInfo())
                             .img(data.getImg())
-                            .isBoosted(null)
+                            .isBoosted(Boolean.FALSE)
                             .boostPriority(null)
                             .build();
                 })
@@ -69,7 +66,7 @@ public class MessageSubscriber {
     }
 
     @KafkaListener(topics = HELPER_UPDATE_TOPIC, groupId = KAFKA_GROUP_ID, containerFactory = "kafkaListenerFactory")
-    public void consumeHelperUpdateMessage(LinkedHashMap<String, Object> payload) {
+    public void consumeHelperUpdateMessage(Map<String, Object> payload) {
         log.info("Received helper update message: {}", payload);
 
         try {
