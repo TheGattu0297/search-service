@@ -97,18 +97,12 @@
         "type": "object",
         "properties": {
           "prodId": {
-            "type": "keyword",
-            "index": false
+            "type": "keyword"
           },
           "prodValue": {
             "type": "text",
             "analyzer": "autocomplete",
-            "search_analyzer": "standard",
-            "fields": {
-              "raw": {
-                "type": "keyword"
-              }
-            }
+            "search_analyzer": "standard"
           }
         }
       },
@@ -154,12 +148,10 @@
         "index": false
       },
       "isBoosted": {
-        "type": "boolean",
-        "index": true
+        "type": "boolean"
       },
       "boostPriority": {
-        "type": "integer",
-        "index": true
+        "type": "integer"
       }
     }
   }

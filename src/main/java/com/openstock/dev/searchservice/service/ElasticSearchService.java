@@ -195,22 +195,23 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#producer", value = PRODUCT_CACHE_PREFIX + "ProductsByProducer", unless = "#result == null")
-    public List<Product> getProductsByProd(String producer) {
+    @Cacheable(key = "#prodId", value = PRODUCT_CACHE_PREFIX + "ProductsByProducer", unless = "#result == null")
+    public List<Product> getProductsByProd(String prodId) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
-                    .query(q -> q.term(t -> t.field("prod.prodValue.raw").value(producer)))
+                    .query(q -> q.term(t -> t.field("prod.prodId").value(prodId)))
                     .size(5000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            log.error("Error finding products by producer - {}: {}", producer, e.getMessage(), e);
+            log.error("Error finding products by producer ID - {}: {}", prodId, e.getMessage(), e);
             return List.of();
         }
     }
+
 
     @Cacheable(key = "#name", value = PRODUCT_CACHE_PREFIX + "ProductsByName", unless = "#result == null")
     public List<Product> getProductsByName(String name) {

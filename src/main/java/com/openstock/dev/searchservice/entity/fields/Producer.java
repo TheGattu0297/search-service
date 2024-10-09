@@ -17,7 +17,7 @@ import java.io.Serializable;
 @Builder
 public class Producer implements Serializable {
 
-    @Field(type = FieldType.Keyword, name = "prodId", index = false)
+    @Field(type = FieldType.Keyword, name = "prodId")
     private String prodId;
 
     @Field(type = FieldType.Text, name = "prodValue")
