@@ -60,9 +60,9 @@ public class SearchController {
         return elasticSearchService.getProductsByDeno(denomination);
     }
 
-    @GetMapping("/prod/{producer}")
-    public List<Product> getProductsByProducer(@PathVariable("producer") String producer) {
-        return elasticSearchService.getProductsByProd(producer);
+    @GetMapping("/prod/{prodId}")
+    public List<Product> getProductsByProducer(@PathVariable("prodId") String prodId) {
+        return elasticSearchService.getProductsByProd(prodId);
     }
 
     @GetMapping("/name/{name}")
