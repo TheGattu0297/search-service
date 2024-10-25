@@ -19,6 +19,6 @@ public class CacheController {
     @DeleteMapping("/invalidate-all")
     public ResponseEntity<String> invalidateAllCaches() {
         cacheService.evictCacheGroupAsync();
-        return ResponseEntity.ok("All Search-Service cache removed!"); // HTTP 204 No Content
+        return ResponseEntity.ok("All Search-Service cache removed!");
     }
 }

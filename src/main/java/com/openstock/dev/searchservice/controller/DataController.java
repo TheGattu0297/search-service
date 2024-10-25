@@ -37,7 +37,7 @@ public class DataController {
     }
 
     @PostMapping("/addBoost")
-    public ResponseEntity<String> manageProductBoosting(@RequestBody ProductBoostRequestDTO request) {
+    public ResponseEntity<String> addBoost(@RequestBody ProductBoostRequestDTO request) {
         try {
             dataService.addBoostToProduct(request);
             return ResponseEntity.ok("Boosting information updated successfully!");
@@ -48,9 +48,9 @@ public class DataController {
     }
 
     @PostMapping("/removeBoost")
-    public ResponseEntity<String> removeProductBoosting(@RequestBody ProductBoostRequestDTO request) {
+    public ResponseEntity<String> removeBoost(@RequestBody String productId) {
         try {
-            dataService.removeBoostFromProduct(request.getProductID(), false);
+            dataService.removeBoostFromProduct(productId);
             return ResponseEntity.ok("Boosting removed successfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
