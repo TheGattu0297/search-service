@@ -13,5 +13,4 @@ public class ProductBoostRequestDTO {
 
     private String productId;
     private Integer boostPriority;  // Priority of boosting (1, 2, 3:Default)
-    private Float ttlHours;
 }
