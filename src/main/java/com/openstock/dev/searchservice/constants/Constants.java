@@ -12,6 +12,10 @@ public final class Constants {
 
     public static final String PRODUCT_WITH_ID = "Product with ID ";
 
+    public static final String BOOST_PARAMETER = "isBoosted";
+
+    public static final String BOOST_PRIORITY = "boostPriority";
+
     // Prefix for cache group
     public static final String PRODUCT_CACHE_PREFIX = "SS:";
 

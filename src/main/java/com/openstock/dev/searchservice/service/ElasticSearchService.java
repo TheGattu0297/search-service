@@ -58,8 +58,27 @@ public class ElasticSearchService {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
-                    .query(q -> q.match(m -> m.field("master").query(master)))
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("master").query(master)))  // Match master field
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field("isBoosted")
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field("boostPriority")
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
                     .size(5000), Product.class);
+
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -75,8 +94,27 @@ public class ElasticSearchService {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
-                    .query(q -> q.term(t -> t.field("country.raw").value(country)))
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("country.raw").query(country)))  // Match country
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
                     .size(5000), Product.class);
+
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -101,14 +139,14 @@ public class ElasticSearchService {
                     // Sort by isBoosted first (boosted products come first)
                     .sort(sort -> sort
                             .field(f -> f
-                                    .field("isBoosted")
+                                    .field(BOOST_PARAMETER)
                                     .order(SortOrder.Desc)  // isBoosted = true first, then false
                             )
                     )
                     // Then sort by boostPriority (lower number = higher priority)
                     .sort(sort -> sort
                             .field(f -> f
-                                    .field("boostPriority")
+                                    .field(BOOST_PRIORITY)
                                     .order(SortOrder.Asc)  // boostPriority 1, 2, 3
                             )
                     )
@@ -125,15 +163,33 @@ public class ElasticSearchService {
         }
     }
 
-
     @Cacheable(key = "#subType", value = PRODUCT_CACHE_PREFIX + "ProductsBySubType", unless = "#result == null")
     public List<Product> getProductsBySubType(String subType) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
-                    .query(q -> q.match(t -> t.field("subType.raw").query(subType)))
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("subType.raw").query(subType)))  // Match subType
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
                     .size(5000), Product.class);
+
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -149,8 +205,27 @@ public class ElasticSearchService {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
-                    .query(q -> q.term(t -> t.field("reg.raw").value(region)))
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("reg.raw").query(region)))  // Match region
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
                     .size(5000), Product.class);
+
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -166,8 +241,27 @@ public class ElasticSearchService {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
-                    .query(q -> q.term(t -> t.field("sub.raw").value(subRegion)))
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("sub.raw").query(subRegion)))  // Match sub-region
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
                     .size(5000), Product.class);
+
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -177,15 +271,33 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#denomination", value = PRODUCT_CACHE_PREFIX + "ProductsByDenomination",
-            unless = "#result == null")
+    @Cacheable(key = "#denomination", value = PRODUCT_CACHE_PREFIX + "ProductsByDenomination", unless = "#result == null")
     public List<Product> getProductsByDeno(String denomination) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
-                    .query(q -> q.term(t -> t.field("deno.raw").value(denomination)))
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("deno.raw").query(denomination)))  // Match denomination
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
                     .size(5000), Product.class);
+
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -201,8 +313,27 @@ public class ElasticSearchService {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
-                    .query(q -> q.term(t -> t.field("prod.prodId").value(prodId)))
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("prod.prodId").query(prodId)))  // Match producer ID
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
                     .size(5000), Product.class);
+
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -212,15 +343,33 @@ public class ElasticSearchService {
         }
     }
 
-
     @Cacheable(key = "#name", value = PRODUCT_CACHE_PREFIX + "ProductsByName", unless = "#result == null")
     public List<Product> getProductsByName(String name) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
-                    .query(q -> q.term(t -> t.field("name.raw").value(name)))
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("name.raw").query(name)))  // Match name
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
                     .size(5000), Product.class);
+
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -236,8 +385,27 @@ public class ElasticSearchService {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
-                    .query(q -> q.term(t -> t.field("variety.raw").value(variety)))
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("variety.raw").query(variety)))  // Match variety
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
                     .size(5000), Product.class);
+
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
@@ -247,15 +415,34 @@ public class ElasticSearchService {
         }
     }
 
-    @Cacheable(key = "#alcoholPercentage", value = PRODUCT_CACHE_PREFIX + "ProductsByAlcoholPercentage",
-            unless = "#result == null")
+    @Cacheable(key = "#alcoholPercentage", value = PRODUCT_CACHE_PREFIX + "ProductsByAlcoholPercentage", unless = "#result == null")
     public List<Product> getProductsByAlc(String alcoholPercentage) {
         log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
-                    .query(q -> q.term(t -> t.field("alc.raw").value(alcoholPercentage)))
+                    .query(q -> q
+                            .regexp(r -> r
+                                    .field("alc")
+                                    .value(alcoholPercentage + ".*")  // Regex to match the alcohol percentage with any following characters
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
                     .size(5000), Product.class);
+
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
