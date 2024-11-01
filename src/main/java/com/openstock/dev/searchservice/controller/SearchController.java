@@ -77,8 +77,7 @@ public class SearchController {
 
     @GetMapping("/alc/{alcoholPercentage}")
     public List<Product> getProductsByAlcoholPercentage(@PathVariable("alcoholPercentage") String alcoholPercentage) {
-        String alc = alcoholPercentage + "%";
-        return elasticSearchService.getProductsByAlc(alc);
+        return elasticSearchService.getProductsByAlc(alcoholPercentage);
     }
 
     @GetMapping("/vintage/{vintage}")
