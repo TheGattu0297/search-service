@@ -48,7 +48,7 @@ public class DataController {
     }
 
     @PostMapping("/removeBoost")
-    public ResponseEntity<String> removeBoost(@RequestBody String productId) {
+    public ResponseEntity<String> removeBoost(@RequestParam String productId) {
         try {
             dataService.removeBoostFromProduct(productId);
             return ResponseEntity.ok("Boosting removed successfully!");
