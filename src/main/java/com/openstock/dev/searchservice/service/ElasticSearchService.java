@@ -458,8 +458,28 @@ public class ElasticSearchService {
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
-                    .query(q -> q.term(t -> t.field("vintage.raw").value(vintage)))
+                    .query(q -> q
+                            .regexp(r -> r
+                                    .field("vintage.raw")
+                                    .value(vintage + ".*")  // Regex to match vintage, allowing any following characters
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
                     .size(5000), Product.class);
+
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();

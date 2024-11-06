@@ -244,8 +244,13 @@ public class DataService {
                 throw new ProductNotFoundException(PRODUCT_WITH_ID + productId + NOT_FOUND);
             }
 
+//            // If the product is not boosted, throw an exception
+//            if (product.getIsBoosted() == null || !product.getIsBoosted()) {
+//                throw new IllegalStateException("Product is not boosted, cannot remove boost.");
+//            }
+
             // If the product is not boosted, throw an exception
-            if (product.getIsBoosted() == null || !product.getIsBoosted()) {
+            if (!Boolean.TRUE.equals(product.getIsBoosted())) {
                 throw new IllegalStateException("Product is not boosted, cannot remove boost.");
             }
 

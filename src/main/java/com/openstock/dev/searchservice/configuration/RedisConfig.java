@@ -67,7 +67,7 @@ public class RedisConfig {
     @Bean
     public CacheManager cacheManager() throws URISyntaxException {
         RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofDays(7)
+                .entryTtl(Duration.ofDays(3)
                         .plusHours(1)
                         .plusMinutes(1)
                         .plusSeconds(59)
