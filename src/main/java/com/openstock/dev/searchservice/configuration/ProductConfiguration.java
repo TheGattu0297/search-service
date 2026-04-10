@@ -30,7 +30,10 @@ public class ProductConfiguration {
         // Setup the low-level client
         RestClient restClient = RestClient.builder(
                         new HttpHost(serverUrl, serverPort, connectionScheme))
-                .setDefaultHeaders(new Header[]{new BasicHeader("Authorization", "ApiKey " + apiKey)})
+                .setDefaultHeaders(
+                        apiKey.isEmpty() ? new Header[0] : new Header[]{new BasicHeader("Authorization",
+                                "ApiKey " + apiKey)}
+                )
                 .build();
 
         // Create the transport layer

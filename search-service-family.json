@@ -1,9 +1,9 @@
 {
-  "taskDefinitionArn": "arn:aws:ecs:eu-west-2:891377108134:task-definition/search-service-family:16",
+  "taskDefinitionArn": "arn:aws:ecs:eu-west-2:891377108134:task-definition/search-service-family:42",
   "containerDefinitions": [
     {
       "name": "search-service-container",
-      "image": "891377108134.dkr.ecr.eu-west-2.amazonaws.com/search-service:f11b423594e47e64a1e25bd5e4ffd70560ccc9fa",
+      "image": "891377108134.dkr.ecr.eu-west-2.amazonaws.com/search-service:ef5aaf0e2996353b0d9c189925acf7b5581513fa",
       "cpu": 0,
       "portMappings": [
         {
@@ -21,11 +21,22 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-create-group": "true",
           "awslogs-group": "/ecs/search-service-family",
+          "awslogs-create-group": "true",
           "awslogs-region": "eu-west-2",
           "awslogs-stream-prefix": "ecs"
-        }
+        },
+        "secretOptions": []
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:8080/health/check || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
       },
       "systemControls": []
     }
@@ -34,7 +45,7 @@
   "taskRoleArn": "arn:aws:iam::891377108134:role/ecs-task-execution-role-secret",
   "executionRoleArn": "arn:aws:iam::891377108134:role/ecs-task-execution-role-secret",
   "networkMode": "awsvpc",
-  "revision": 16,
+  "revision": 42,
   "volumes": [],
   "status": "ACTIVE",
   "requiresAttributes": [
@@ -52,6 +63,9 @@
     },
     {
       "name": "com.amazonaws.ecs.capability.task-iam-role"
+    },
+    {
+      "name": "ecs.capability.container-health-check"
     },
     {
       "name": "ecs.capability.execution-role-ecr-pull"
@@ -80,7 +94,7 @@
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
   },
-  "registeredAt": "2024-06-04T10:41:29.236Z",
-  "registeredBy": "arn:aws:iam::891377108134:user/Vishal",
+  "registeredAt": "2024-09-19T14:38:02.318Z",
+  "registeredBy": "arn:aws:iam::891377108134:user/Sakethram",
   "tags": []
 }

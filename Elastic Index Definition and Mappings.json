@@ -2,24 +2,21 @@
 {
   "settings": {
     "analysis": {
-      "tokenizer": {
-        "edge_ngram_tokenizer": {
+      "filter": {
+        "autocomplete_filter": {
           "type": "edge_ngram",
           "min_gram": 1,
-          "max_gram": 20,
-          "token_chars": [
-            "letter",
-            "digit",
-            "punctuation",
-            "symbol"
-          ]
+          "max_gram": 20
         }
       },
       "analyzer": {
         "autocomplete": {
           "type": "custom",
-          "tokenizer": "edge_ngram_tokenizer",
-          "filter": ["lowercase"]
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "autocomplete_filter"
+          ]
         }
       }
     }
@@ -30,8 +27,7 @@
         "type": "keyword"
       },
       "master": {
-        "type": "text",
-        "index": true
+        "type": "keyword"
       },
       "country": {
         "type": "text",
@@ -98,12 +94,15 @@
         }
       },
       "prod": {
-        "type": "text",
-        "analyzer": "autocomplete",
-        "search_analyzer": "standard",
-        "fields": {
-          "raw": {
+        "type": "object",
+        "properties": {
+          "prodId": {
             "type": "keyword"
+          },
+          "prodValue": {
+            "type": "text",
+            "analyzer": "autocomplete",
+            "search_analyzer": "standard"
           }
         }
       },
@@ -128,14 +127,7 @@
         }
       },
       "alc": {
-        "type": "text",
-        "analyzer": "autocomplete",
-        "search_analyzer": "standard",
-        "fields": {
-          "raw": {
-            "type": "keyword"
-          }
-        }
+        "type": "text"
       },
       "vintage": {
         "type": "text",
@@ -154,6 +146,12 @@
       "img": {
         "type": "text",
         "index": false
+      },
+      "isBoosted": {
+        "type": "boolean"
+      },
+      "boostPriority": {
+        "type": "integer"
       }
     }
   }

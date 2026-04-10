@@ -1,102 +1,29 @@
 package com.openstock.dev.searchservice.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.BulkRequest;
-import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import com.openstock.dev.searchservice.model.Product;
+import co. elastic. clients. elasticsearch._types. SortOrder;
+import com.openstock.dev.searchservice.entity.Product;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.openstock.dev.searchservice.constants.Constants.ELASTIC_INDEX;
+import static com.openstock.dev.searchservice.constants.Constants.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class ElasticSearchService {
 
     private final ElasticsearchClient elasticsearchClient;
 
-    public ElasticSearchService(ElasticsearchClient elasticsearchClient) {
-        this.elasticsearchClient = elasticsearchClient;
-    }
-
-    /**
-     * Persist the individual Product entity in the Elasticsearch cluster
-     */
-    public void saveProduct(Product product) {
-        try {
-            elasticsearchClient.index(i -> i
-                    .index(ELASTIC_INDEX)
-                    .id(product.getProductID())  // Set the ID here
-                    .document(product)
-            );
-        } catch (Exception e) {
-            log.error("Error saving product: {}", e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Bulk-save the Products in the Elasticsearch cluster
-     */
-    public void saveProducts(List<Product> productList) {
-        try {
-            BulkRequest.Builder bulkRequest = new BulkRequest.Builder();
-            for (Product product : productList) {
-                bulkRequest.operations(op -> op
-                        .index(idx -> idx
-                                .index(ELASTIC_INDEX)
-                                .id(product.getProductID())  // Set the ID here
-                                .document(product)
-                        )
-                );
-            }
-            BulkResponse bulkResponse = elasticsearchClient.bulk(bulkRequest.build());
-            if (bulkResponse.errors()) {
-                log.error("Errors occurred during bulk save: {}", bulkResponse.items().size());
-            }
-        } catch (Exception e) {
-            log.error("Error saving products: {}", e.getMessage(), e);
-        }
-    }
-
-    public List<Product> getProducts() {
-        try {
-            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .matchAll(m -> m)
-                    ).size(10000), Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error retrieving all products: {}", e.getMessage(), e);
-            return List.of();
-        }
-    }
-
-    public Iterable<Product> getProductsInRange(int from, int size) {
-        try {
-            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                            .index(ELASTIC_INDEX)
-                            .query(q -> q
-                                    .matchAll(m -> m)
-                            ).from(from) // Starting index
-                            .size(size) // Number of records to fetch
-                    , Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error retrieving all products: {}", e.getMessage(), e);
-            return List.of();
-        }
-    }
-
+    @Cacheable(key = "#productId", value = PRODUCT_CACHE_PREFIX + "Product", unless = "#result == null")
     public Product getProductById(String productId) {
+        log.info(DB_CALL);
         try {
             return elasticsearchClient.get(g -> g
                             .index(ELASTIC_INDEX)
@@ -108,246 +35,457 @@ public class ElasticSearchService {
         }
     }
 
-    public List<Product> getProductByMaster(String keyword) {
+    @Cacheable(key = "'getAllProducts'", value = PRODUCT_CACHE_PREFIX + "AllProducts", unless = "#result == null")
+    public List<Product> getAllProducts() {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .match(m -> m
-                                    .field("master")
-                                    .query(keyword)
-                            )
-                    ).size(5000), Product.class);
+                    .query(q -> q.matchAll(m -> m))
+                    .size(10000), Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            log.error("Error finding products by master - {}: {}", keyword, e.getMessage(), e);
+            log.error("Error retrieving all products: {}", e.getMessage(), e);
             return List.of();
         }
     }
 
-    public List<Product> findByCountry(String keyword) {
+    @Cacheable(key = "#master", value = PRODUCT_CACHE_PREFIX + "ProductsByMaster", unless = "#result == null")
+    public List<Product> getProductByMaster(String master) {
+        log.info(DB_CALL);
         try {
             SearchResponse<Product> response = elasticsearchClient.search(s -> s
                     .index(ELASTIC_INDEX)
                     .query(q -> q
-                            .term(t -> t
-                                    .field("country.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("master").query(master)))  // Match master field
                             )
-                    ).size(5000), Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error finding products by country - {}: {}", keyword, e.getMessage(), e);
-            return List.of();
-        }
-    }
-
-    public List<Product> findByType(String keyword) {
-        try {
-            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("type.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error finding products by type - {}: {}", keyword, e.getMessage(), e);
-            return List.of();
-        }
-    }
-
-    public List<Product> findBySubType(String keyword) {
-        try {
-            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("subType.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error finding products by subType - {}: {}", keyword, e.getMessage(), e);
-            return List.of();
-        }
-    }
-
-    public List<Product> findByReg(String keyword) {
-        try {
-            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("reg.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error finding products by region - {}: {}", keyword, e.getMessage(), e);
-            return List.of();
-        }
-    }
-
-    public List<Product> findBySub(String keyword) {
-        try {
-            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("sub.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error finding products by sub-region - {}: {}", keyword, e.getMessage(), e);
-            return List.of();
-        }
-    }
-
-    public List<Product> findByDeno(String keyword) {
-        try {
-            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("deno.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error finding products by denomination - {}: {}", keyword, e.getMessage(), e);
-            return List.of();
-        }
-    }
-
-    public List<Product> findByProd(String keyword) {
-        try {
-            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("prod.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            ElasticSearchService.log.error("Error finding products by producer - {}: {}", keyword, e.getMessage(), e);
-            return List.of();
-        }
-    }
-
-
-
-    public List<Product> findByName(String keyword) {
-        try {
-            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("name.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error finding products by name - {}: {}", keyword, e.getMessage(), e);
-            return List.of();
-        }
-    }
-
-    public List<Product> findByVariety(String keyword) {
-        try {
-            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("variety.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error finding products by variety - {}: {}", keyword, e.getMessage(), e);
-            return List.of();
-        }
-    }
-
-    public List<Product> findByAlc(String keyword) {
-        try {
-            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(m -> m
-                                    .field("alc.raw")
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error finding products by alcohol percentage - {}: {}", keyword, e.getMessage(), e);
-            return List.of();
-        }
-    }
-
-    public List<Product> findByVintage(String keyword) {
-        try {
-            SearchResponse<Product> response = elasticsearchClient.search(s -> s
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .term(t -> t
-                                    .field("vintage.raw") // Ensure the field is a keyword type
-                                    .value(keyword)
-                            )
-                    ).size(5000), Product.class);
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error finding products by vintage - {}: {}", keyword, e.getMessage(), e);
-            return List.of();
-        }
-    }
-
-    public void deleteAll() {
-        try {
-            elasticsearchClient.deleteByQuery(d -> d
-                    .index(ELASTIC_INDEX)
-                    .query(q -> q
-                            .matchAll(m -> m)
                     )
-            );
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field("isBoosted")
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field("boostPriority")
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
+                    .size(5000), Product.class);
+
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .toList();
         } catch (Exception e) {
-            log.error("Error deleting all products: {}", e.getMessage(), e);
+            log.error("Error finding products by master - {}: {}", master, e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    @Cacheable(key = "#country", value = PRODUCT_CACHE_PREFIX + "ProductsByCountry", unless = "#result == null")
+    public List<Product> getProductsByCountry(String country) {
+        log.info(DB_CALL);
+        try {
+            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("country.raw").query(country)))  // Match country
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
+                    .size(5000), Product.class);
+
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error finding products by country - {}: {}", country, e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    @Cacheable(key = "#type", value = PRODUCT_CACHE_PREFIX + "ProductsByType", unless = "#result == null")
+    public List<Product> getProductsByType(String type) {
+        log.info(DB_CALL);
+        try {
+            // Search for products by type
+            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("type.raw").query(type)))  // Match type
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
+                    .size(5000), Product.class);
+
+            // Return the products list
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .toList();
+
+        } catch (Exception e) {
+            log.error("Error finding products by type - {}: {}", type, e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    @Cacheable(key = "#subType", value = PRODUCT_CACHE_PREFIX + "ProductsBySubType", unless = "#result == null")
+    public List<Product> getProductsBySubType(String subType) {
+        log.info(DB_CALL);
+        try {
+            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("subType.raw").query(subType)))  // Match subType
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
+                    .size(5000), Product.class);
+
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error finding products by subType - {}: {}", subType, e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    @Cacheable(key = "#region", value = PRODUCT_CACHE_PREFIX + "ProductsByRegion", unless = "#result == null")
+    public List<Product> getProductsByReg(String region) {
+        log.info(DB_CALL);
+        try {
+            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("reg.raw").query(region)))  // Match region
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
+                    .size(5000), Product.class);
+
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error finding products by region - {}: {}", region, e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    @Cacheable(key = "#subRegion", value = PRODUCT_CACHE_PREFIX + "ProductsBySubRegion", unless = "#result == null")
+    public List<Product> getProductsBySub(String subRegion) {
+        log.info(DB_CALL);
+        try {
+            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("sub.raw").query(subRegion)))  // Match sub-region
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
+                    .size(5000), Product.class);
+
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error finding products by sub-region - {}: {}", subRegion, e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    @Cacheable(key = "#denomination", value = PRODUCT_CACHE_PREFIX + "ProductsByDenomination", unless = "#result == null")
+    public List<Product> getProductsByDeno(String denomination) {
+        log.info(DB_CALL);
+        try {
+            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("deno.raw").query(denomination)))  // Match denomination
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
+                    .size(5000), Product.class);
+
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error finding products by denomination - {}: {}", denomination, e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    @Cacheable(key = "#prodId", value = PRODUCT_CACHE_PREFIX + "ProductsByProducer", unless = "#result == null")
+    public List<Product> getProductsByProd(String prodId) {
+        log.info(DB_CALL);
+        try {
+            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("prod.prodId").query(prodId)))  // Match producer ID
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
+                    .size(5000), Product.class);
+
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error finding products by producer ID - {}: {}", prodId, e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    @Cacheable(key = "#name", value = PRODUCT_CACHE_PREFIX + "ProductsByName", unless = "#result == null")
+    public List<Product> getProductsByName(String name) {
+        log.info(DB_CALL);
+        try {
+            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("name.raw").query(name)))  // Match name
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
+                    .size(5000), Product.class);
+
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error finding products by name - {}: {}", name, e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    @Cacheable(key = "#variety", value = PRODUCT_CACHE_PREFIX + "ProductsByVariety", unless = "#result == null")
+    public List<Product> getProductsByVariety(String variety) {
+        log.info(DB_CALL);
+        try {
+            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m.match(t -> t.field("variety.raw").query(variety)))  // Match variety
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
+                    .size(5000), Product.class);
+
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error finding products by variety - {}: {}", variety, e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    @Cacheable(key = "#alcoholPercentage", value = PRODUCT_CACHE_PREFIX + "ProductsByAlcoholPercentage", unless = "#result == null")
+    public List<Product> getProductsByAlc(String alcoholPercentage) {
+        log.info(DB_CALL);
+        try {
+            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q
+                            .regexp(r -> r
+                                    .field("alc")
+                                    .value(alcoholPercentage + ".*")  // Regex to match the alcohol percentage with any following characters
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
+                    .size(5000), Product.class);
+
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error finding products by alcohol percentage - {}: {}", alcoholPercentage, e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    @Cacheable(key = "#vintage", value = PRODUCT_CACHE_PREFIX + "ProductsByVintage", unless = "#result == null")
+    public List<Product> getProductsByVintage(String vintage) {
+        log.info(DB_CALL);
+        try {
+            SearchResponse<Product> response = elasticsearchClient.search(s -> s
+                    .index(ELASTIC_INDEX)
+                    .query(q -> q
+                            .regexp(r -> r
+                                    .field("vintage.raw")
+                                    .value(vintage + ".*")  // Regex to match vintage, allowing any following characters
+                            )
+                    )
+                    // Sort by isBoosted first (boosted products come first)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PARAMETER)
+                                    .order(SortOrder.Desc)  // isBoosted = true first, then false
+                            )
+                    )
+                    // Then sort by boostPriority (lower number = higher priority)
+                    .sort(sort -> sort
+                            .field(f -> f
+                                    .field(BOOST_PRIORITY)
+                                    .order(SortOrder.Asc)  // boostPriority 1, 2, 3
+                            )
+                    )
+                    .size(5000), Product.class);
+
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error finding products by vintage - {}: {}", vintage, e.getMessage(), e);
+            return List.of();
         }
     }
 
@@ -364,94 +502,30 @@ public class ElasticSearchService {
                                                     )
                                             )
                                             .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("country")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
+                                                    .term(t -> t
+                                                            .field("master")
+                                                            .value(searchKeyword)
                                                     )
                                             )
                                             .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("type")
+                                                    .multiMatch(mm -> mm
                                                             .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("subType")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("reg")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("sub")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("deno")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("prod")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("name")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("variety")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("alc")
-                                                            .query(searchKeyword)
-                                                            .fuzziness("AUTO")
-                                                    )
-                                            )
-                                            .should(sh -> sh
-                                                    .match(m -> m
-                                                            .field("vintage")
-                                                            .query(searchKeyword)
+                                                            .fields("prod.prodValue^5", "deno^5",
+                                                                    "vintage^5", "country^3", "name^3", "reg^3",
+                                                                    "type^3", "subType", "sub", "variety", "alc")
                                                             .fuzziness("AUTO")
                                                     )
                                             )
                                     )
                             )
-                            .size(10) // Limiting to top 10 results
-                    , Product.class);
-
+                            .size(100), // Limiting to top 100 results
+                    Product.class);
             return response.hits().hits().stream()
                     .map(Hit::source)
                     .toList();
         } catch (Exception e) {
-            // Handle exceptions or log error
-            return List.of(); // Return an empty list or handle accordingly
+            log.error("Error performing search for query - {}: {}", searchKeyword, e.getMessage(), e);
+            return List.of();
         }
     }
-
 }

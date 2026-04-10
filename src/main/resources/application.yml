@@ -3,19 +3,33 @@ server:
   port: 8080
 
 elastic:
-  server_url: <server_url>
-#  server_url: openstock-search-service.es.eu-west-2.aws.cloud.es.io
-  server_port: 9243
-  api_key: <api_key>
-#  api_key: Q19WamtwQUJUcW5nNHB5TDAzWGM6eUt3Z0ZhVllUcHF2Qk82Nnp3Ri1wdw==
-  connection_scheme: https
+#  server_url: localhost  # Local Elasticsearch
+    server_url: <server_url>  # AWS Elasticsearch for cloud deployment
+#  server_port: 9200  # Default local port for Elasticsearch
+    server_port: 9243  # AWS default port for Elasticsearch
+#  connection_scheme: http  # Use HTTP for local Elasticsearch
+    connection_scheme: https  # HTTPS for AWS Elasticsearch
+#  api_key:
+    api_key: <api_key>
 
 kafka:
-#  url: ec2-18-175-61-146.eu-west-2.compute.amazonaws.com
+#  url: localhost  # Local Kafka
   url: <kafka_url>
   port: 9092
 
 spring:
+  cache:
+    type: redis
+  task:
+    scheduling:
+      timezone: Europe/London
+
   kafka:
-#    bootstrap-servers: ec2-18-175-61-146.eu-west-2.compute.amazonaws.com
+#    bootstrap-servers: localhost:9092  # Local Kafka
     bootstrap-servers: <kafka_url>
+
+  redis:
+#    uri: redis://default:ymT7w9BJ99CIFpLES8nWrso9PU5Dz2a8@redis-11002.c72.eu-west-1-2.ec2.redns.redis-cloud.com:11002
+    uri: redis://<redis_user>:<redis_password>@redis-10918.c338.eu-west-2-1.ec2.redns.redis-cloud.com:10918
+
+

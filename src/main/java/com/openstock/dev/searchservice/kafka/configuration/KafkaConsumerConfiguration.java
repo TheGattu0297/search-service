@@ -10,6 +10,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
+import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.lang.Nullable;
 
@@ -54,10 +55,13 @@ public class KafkaConsumerConfiguration {
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerFactory(
-            @Nullable DeadLetterPublishingRecoverer recoverer, ConsumerFactory consumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
+            @Nullable DeadLetterPublishingRecoverer recoverer, ConsumerFactory<String, Object> consumerFactory) {
+
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
+        if (recoverer != null) {
+            factory.setCommonErrorHandler(new DefaultErrorHandler(recoverer));
+        }
         return factory;
     }
 }
